@@ -547,17 +547,11 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
       {/* Top Header & Master Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 pb-3 border-b border-neutral-200/60">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#0f172a] font-heading">
-              Сводный монитор и тренды
-            </h1>
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-[5px] bg-emerald-50 text-emerald-700 text-[10px] font-bold font-sans border border-emerald-200/70">
-              <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${!isPaused ? 'animate-pulse' : ''}`} />
-              <span>{isPaused ? 'ПАУЗА' : 'LIVE 250 мс'}</span>
-            </span>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#0f172a] font-heading">
+            Сводный монитор и тренды
+          </h1>
           <p className="text-xs text-neutral-400 font-sans mt-0.5">
-            Прецизионный многоканальный самописец (IEC 62541-11 HDA) и кросс-серверный Watchlist
+            Мониторинг параметров оборудования и динамика технологических процессов в реальном времени
           </p>
         </div>
 
@@ -724,7 +718,7 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                       x={padding.left - 8}
                       y={tick.y + 3.5}
                       textAnchor="end"
-                      className="text-[11px] fill-neutral-400 font-mono font-medium select-none"
+                      className="text-[11px] fill-neutral-400 font-heading font-medium select-none"
                     >
                       {tick.val} {currentPreset.unit}
                     </text>
@@ -851,10 +845,10 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                       <text x="10" y="16" fill="#94a3b8" className="text-[10px] font-sans font-medium">
                         T - {Math.round((POINTS_COUNT - 1 - hoverIndex) * 1.5)} сек назад
                       </text>
-                      <text x="10" y="32" fill="#38bdf8" className="text-[11px] font-bold font-mono">
+                      <text x="10" y="32" fill="#38bdf8" className="text-[11px] font-bold font-heading">
                         PV: {historyPV[hoverIndex]} {currentPreset.unit}
                       </text>
-                      <text x="10" y="46" fill="#f59e0b" className="text-[11px] font-bold font-mono">
+                      <text x="10" y="46" fill="#f59e0b" className="text-[11px] font-bold font-heading">
                         SP: {historySP[hoverIndex]} {currentPreset.unit}
                       </text>
                     </g>
@@ -890,7 +884,7 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                 >
                   <span className="text-neutral-400">Шкала:</span>
                   <strong className="text-white">{isZoomMode ? 'Фокус (PID детали)' : 'Полный диапазон'}</strong>
-                  <span className="text-sky-400 font-mono text-[10px]">[{yMin}..{yMax} {currentPreset.unit}]</span>
+                  <span className="text-sky-400 font-heading text-[10px]">[{yMin}..{yMax} {currentPreset.unit}]</span>
                 </button>
               </div>
             </div>
