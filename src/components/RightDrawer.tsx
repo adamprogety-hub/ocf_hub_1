@@ -795,7 +795,7 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                   <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                     Обнаружено в сети
                   </span>
-                  <span className="text-[11px] font-mono text-emerald-400 font-medium flex items-center gap-1">
+                  <span className="text-[11px] font-heading text-emerald-400 font-medium flex items-center gap-1">
                     <span className="w-1 h-1 rounded-full bg-emerald-400" />
                     {filteredDiscovered.length} узла
                   </span>
@@ -851,7 +851,7 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                             >
                               {dev.name}
                             </h4>
-                            <div className="text-[11px] font-mono text-neutral-400 truncate mt-0.5">
+                            <div className="text-[11px] font-heading text-neutral-400 truncate mt-0.5">
                               {dev.endpoint.replace('opc.tcp://', '')} • {dev.tagsCount} тегов
                             </div>
                           </div>
@@ -859,7 +859,7 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
 
                         {/* Right: Latency badge */}
                         <div className="shrink-0 flex items-center">
-                          <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[5px]">
+                          <span className="text-[10px] font-heading font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[5px]">
                             {dev.pingMs} мс
                           </span>
                         </div>
@@ -1059,7 +1059,7 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
 
                   <div className="flex items-center justify-between py-1.5 border-b border-white/10">
                     <span className="text-neutral-400">Количество тегов:</span>
-                    <span className="font-black text-white font-mono text-sm">
+                    <span className="font-black text-white font-heading text-sm">
                       {connection.tagsCount}
                     </span>
                   </div>

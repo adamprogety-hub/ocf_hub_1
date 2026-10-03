@@ -658,7 +658,7 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                 <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-400/25 px-3 py-1 rounded-[8px]">
                   <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
                   <span className="text-sky-300 font-medium text-xs">{currentPreset.penPV.label}:</span>
-                  <span className="font-heading font-black text-sm text-sky-100 font-mono">
+                  <span className="font-heading font-black text-sm text-sky-100">
                     {currentPV} {currentPreset.unit}
                   </span>
                 </div>
@@ -667,7 +667,7 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                 <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-400/25 px-3 py-1 rounded-[8px]">
                   <span className="w-2 h-0.5 rounded bg-amber-400" />
                   <span className="text-amber-300 font-medium text-xs">{currentPreset.penSP.label}:</span>
-                  <span className="font-heading font-black text-sm text-amber-100 font-mono">
+                  <span className="font-heading font-black text-sm text-amber-100">
                     {currentSP} {currentPreset.unit}
                   </span>
                 </div>
@@ -676,7 +676,7 @@ export const MonitorTrendsView: React.FC<MonitorTrendsViewProps> = ({
                 <div className="hidden md:flex items-center gap-1.5 text-neutral-300 bg-white/[0.05] border border-white/[0.08] px-2.5 py-1 rounded-[8px]">
                   <span className="text-[11px] text-neutral-400">Невязка Δ:</span>
                   <span
-                    className={`font-bold font-mono text-xs ${
+                    className={`font-bold font-heading text-xs ${
                       Math.abs(currentError) > 0.5 ? 'text-amber-400' : 'text-emerald-400'
                     }`}
                   >

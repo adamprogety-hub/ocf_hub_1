@@ -38,65 +38,27 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
     }
   };
 
-  const getStatusStyles = () => {
+  const getStatusText = () => {
     switch (connection.status) {
       case 'online':
-        return {
-          bgClass: 'bg-emerald-500 text-neutral-950 shadow-md',
-          statusText: `В сети • ${connection.pingMs} мс`,
-          statusTextClass: 'text-emerald-950/75',
-          secondaryTextClass: 'text-emerald-950/70',
-          dividerClass: 'border-black/10',
-          paramBtnClass: 'bg-black/10 hover:bg-black/20 text-neutral-950 border border-black/15',
-          actionBtnClass: 'bg-neutral-950 hover:bg-black text-white shadow-xs',
-          deleteBtnHover: 'text-black/50 hover:text-black hover:bg-black/10',
-        };
+        return `В сети • ${connection.pingMs} мс`;
       case 'error':
-        return {
-          bgClass: 'bg-rose-500 text-neutral-950 shadow-md',
-          statusText: 'Ошибка связи',
-          statusTextClass: 'text-neutral-950 font-bold',
-          secondaryTextClass: 'text-neutral-950/70',
-          dividerClass: 'border-black/10',
-          paramBtnClass: 'bg-black/10 hover:bg-black/20 text-neutral-950 border border-black/15',
-          actionBtnClass: 'bg-neutral-950 hover:bg-black text-white shadow-xs',
-          deleteBtnHover: 'text-black/50 hover:text-black hover:bg-black/10',
-        };
+        return 'Ошибка связи';
       case 'connecting':
-        return {
-          bgClass: 'bg-amber-400 text-neutral-950 shadow-md',
-          statusText: 'Подключение...',
-          statusTextClass: 'text-amber-950/80 font-bold',
-          secondaryTextClass: 'text-amber-950/70',
-          dividerClass: 'border-black/10',
-          paramBtnClass: 'bg-black/10 hover:bg-black/20 text-neutral-950 border border-black/15',
-          actionBtnClass: 'bg-neutral-950 hover:bg-black text-white shadow-xs',
-          deleteBtnHover: 'text-black/50 hover:text-black hover:bg-black/10',
-        };
+        return 'Подключение...';
       case 'standby':
       default:
-        return {
-          bgClass: 'bg-neutral-200 text-neutral-900 border border-neutral-300 shadow-xs',
-          statusText: 'Ожидание / Вне сети',
-          statusTextClass: 'text-neutral-600',
-          secondaryTextClass: 'text-neutral-500',
-          dividerClass: 'border-neutral-300/80',
-          paramBtnClass: 'bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 shadow-2xs',
-          actionBtnClass: 'bg-neutral-900 hover:bg-black text-white shadow-xs',
-          deleteBtnHover: 'text-neutral-400 hover:text-neutral-900 hover:bg-neutral-300/60',
-        };
+        return 'Ожидание / Вне сети';
     }
   };
-
-  const status = getStatusStyles();
 
   return (
     <div
       onClick={onSelect}
-      className={`rounded-[16px] p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 ease-out relative select-none group min-h-[160px] ${status.bgClass} ${
+      className={`rounded-[16px] p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 ease-out relative select-none group min-h-[160px] ${
         isSelected
-          ? 'ring-3 ring-violet-600 ring-offset-2 ring-offset-white shadow-[0_16px_36px_rgba(124,58,237,0.32)] -translate-y-1.5 scale-[1.01]'
-          : 'hover:-translate-y-1 hover:shadow-lg'
+          ? 'bg-[#0c0e14] text-white border border-violet-500/80 ring-2 ring-violet-500/30 shadow-[0_16px_36px_rgba(0,0,0,0.4),0_0_24px_rgba(124,58,237,0.22)] -translate-y-1 scale-[1.01]'
+          : 'bg-white hover:bg-neutral-50/70 text-neutral-900 border border-neutral-200/90 hover:border-neutral-300 shadow-xs hover:shadow-md hover:-translate-y-0.5'
       }`}
     >
       {/* Top Header: Title & Discrete Delete Button */}
@@ -104,10 +66,15 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
         <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 min-w-0">
             {isSelected && (
-              <span className="w-2 h-2 rounded-full bg-violet-950 shrink-0" title="Активно в панели справа" />
+              <span
+                className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_#a855f7] shrink-0 animate-pulse"
+                title="Активно в панели справа"
+              />
             )}
             <h3
-              className="text-base font-black tracking-tight font-heading leading-snug truncate text-neutral-950"
+              className={`text-base font-black tracking-tight font-heading leading-snug truncate transition-colors ${
+                isSelected ? 'text-white' : 'text-neutral-950'
+              }`}
               title={connection.name}
             >
               {connection.name}
@@ -119,8 +86,12 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
             onClick={handleDeleteClick}
             className={`p-1.5 rounded-lg transition-all shrink-0 cursor-pointer ${
               confirmDelete
-                ? 'bg-neutral-950 text-white px-2.5 text-[10px] font-bold flex items-center gap-1 shadow-sm'
-                : `opacity-0 group-hover:opacity-100 ${status.deleteBtnHover}`
+                ? isSelected
+                  ? 'bg-rose-500 text-white px-2.5 text-[10px] font-bold flex items-center gap-1 shadow-sm'
+                  : 'bg-neutral-950 text-white px-2.5 text-[10px] font-bold flex items-center gap-1 shadow-sm'
+                : isSelected
+                ? 'opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-white hover:bg-white/10'
+                : 'opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100'
             }`}
             title={confirmDelete ? 'Подтвердите удаление' : 'Удалить'}
           >
@@ -135,22 +106,38 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
           </button>
         </div>
 
-        {/* Big Number (Clean Two-Liner) */}
+        {/* Big Number (Clean Two-Liner using Manrope font-heading) */}
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-2xl sm:text-3xl font-black tracking-tight font-mono text-neutral-950">
+          <span
+            className={`text-2xl sm:text-3xl font-black tracking-tight font-heading transition-colors ${
+              isSelected ? 'text-white' : 'text-neutral-950'
+            }`}
+          >
             {connection.tagsCount}
           </span>
-          <span className={`text-xs font-bold font-sans ${status.secondaryTextClass}`}>
+          <span
+            className={`text-xs font-bold font-sans transition-colors ${
+              isSelected ? 'text-neutral-400' : 'text-neutral-400'
+            }`}
+          >
             тегов
           </span>
         </div>
       </div>
 
-      {/* Bottom Row: Status Text (Dot Removed) + Action Buttons */}
-      <div className={`mt-3 pt-3 flex items-center justify-between border-t ${status.dividerClass}`}>
-        {/* Status Text replacing the old dot indicator */}
-        <span className={`text-[11px] font-sans font-medium truncate max-w-[130px] ${status.statusTextClass}`}>
-          {status.statusText}
+      {/* Bottom Row: Status Text + Action Buttons */}
+      <div
+        className={`mt-3 pt-3 flex items-center justify-between border-t transition-colors ${
+          isSelected ? 'border-white/10' : 'border-neutral-100'
+        }`}
+      >
+        {/* Status Text (clean, no bright background fill) */}
+        <span
+          className={`text-[11px] font-sans font-medium truncate max-w-[130px] transition-colors ${
+            isSelected ? 'text-neutral-400' : 'text-neutral-500'
+          }`}
+        >
+          {getStatusText()}
         </span>
 
         {/* Action Buttons: Параметры + Войти */}
@@ -164,7 +151,11 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
                 onSelect();
               }
             }}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-xs font-bold transition-all shrink-0 font-sans cursor-pointer ${status.paramBtnClass}`}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-xs font-bold transition-all shrink-0 font-sans cursor-pointer ${
+              isSelected
+                ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
+                : 'bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 border border-neutral-200/80'
+            }`}
             title="Открыть параметры подключения"
           >
             <SlidersHorizontal size={13} weight="bold" />
@@ -176,7 +167,11 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
               e.stopPropagation();
               onConnect(connection);
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-bold transition-all hover:scale-102 shrink-0 font-sans cursor-pointer active:scale-95 ${status.actionBtnClass}`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-bold transition-all hover:scale-102 shrink-0 font-sans cursor-pointer active:scale-95 ${
+              isSelected
+                ? 'bg-violet-600 hover:bg-violet-500 text-white shadow-md'
+                : 'bg-neutral-900 hover:bg-black text-white shadow-xs'
+            }`}
             title="Войти в сессию OPC UA"
           >
             <span>Войти</span>

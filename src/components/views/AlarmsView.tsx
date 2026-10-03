@@ -385,14 +385,14 @@ export const AlarmsView: React.FC<AlarmsViewProps> = ({ onShowToast, onNavigateT
                     <h3 className="text-sm sm:text-base font-black text-neutral-950 font-heading tracking-tight leading-snug truncate" title={alarm.sourceName}>
                       {alarm.sourceName}
                     </h3>
-                    <span className="text-[11px] font-mono font-bold text-black/60 shrink-0 mt-0.5">
+                    <span className="text-[11px] font-heading font-bold text-black/60 shrink-0 mt-0.5">
                       {alarm.activeTime}
                     </span>
                   </div>
 
                   {/* Minimal Hero Value & Short Reason */}
                   <div className="my-2">
-                    <div className="text-3xl font-black font-mono text-neutral-950 tracking-tight">
+                    <div className="text-3xl font-black font-heading text-neutral-950 tracking-tight">
                       {alarm.value}
                     </div>
                     <p className="text-xs text-black/85 font-sans font-bold mt-0.5 tracking-tight truncate">
@@ -403,7 +403,7 @@ export const AlarmsView: React.FC<AlarmsViewProps> = ({ onShowToast, onNavigateT
 
                 {/* Minimal Card Footer: Clean Acknowledge Button */}
                 <div className="pt-2 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-                  <span className="text-[11px] text-black/60 font-mono font-semibold">
+                  <span className="text-[11px] text-black/60 font-heading font-semibold">
                     {isCritical ? 'Критическая' : isHigh ? 'Высокая' : 'Предупреждение'}
                   </span>
 

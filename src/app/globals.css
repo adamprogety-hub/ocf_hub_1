@@ -24,7 +24,7 @@
   }
 
   code, pre, .font-mono {
-    font-family: var(--font-sans);
+    font-family: var(--font-heading);
   }
 
   /* Hide Next.js dev overlay button/indicators */
