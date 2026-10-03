@@ -7,6 +7,8 @@ import {
   CheckCircle,
   Lightning,
 } from '@phosphor-icons/react';
+import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomNumberInput } from '@/components/ui/CustomNumberInput';
 import type { OpcConnection } from '../types/opc';
 
 interface AddConnectionModalProps {
@@ -154,17 +156,18 @@ export const AddConnectionModal: React.FC<AddConnectionModalProps> = ({
             <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1 font-sans">
               Модель ПЛК / Источник данных
             </label>
-            <select
+            <CustomSelect
               value={controllerType}
-              onChange={(e) => setControllerType(e.target.value)}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs text-neutral-800 font-sans focus:outline-none focus:border-neutral-900"
-            >
-              <option value="Siemens S7-1200 / S7-1500">Siemens S7-1200 / S7-1500 (TIA Portal)</option>
-              <option value="Schneider Modicon M241 / M262">Schneider Modicon M241 / M262</option>
-              <option value="Овен ПЛК210 / Codesys v3.5">Овен ПЛК210 / ПЛК200 (Codesys)</option>
-              <option value="Carel pCO5 / Шлюз c.pCO">Carel pCO / Холодильная автоматика</option>
-              <option value="Другой OPC UA сервер">Другой OPC UA сервер (FreeOpcUa / Kepware)</option>
-            </select>
+              onChange={setControllerType}
+              variant="light"
+              options={[
+                { value: 'Siemens S7-1200 / S7-1500', label: 'Siemens S7-1200 / S7-1500 (TIA Portal)' },
+                { value: 'Schneider Modicon M241 / M262', label: 'Schneider Modicon M241 / M262' },
+                { value: 'Овен ПЛК210 / Codesys v3.5', label: 'Овен ПЛК210 / ПЛК200 (Codesys)' },
+                { value: 'Carel pCO5 / Шлюз c.pCO', label: 'Carel pCO / Холодильная автоматика' },
+                { value: 'Другой OPC UA сервер', label: 'Другой OPC UA сервер (FreeOpcUa / Kepware)' },
+              ]}
+            />
           </div>
 
           {/* Security Policy & Mode */}
@@ -173,30 +176,32 @@ export const AddConnectionModal: React.FC<AddConnectionModalProps> = ({
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1 font-sans">
                 Политика безопасности
               </label>
-              <select
+              <CustomSelect
                 value={securityPolicy}
-                onChange={(e) => setSecurityPolicy(e.target.value)}
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs text-neutral-800 font-sans focus:outline-none focus:border-neutral-900"
-              >
-                <option value="Basic256Sha256">Basic256Sha256</option>
-                <option value="Aes128_Sha256_RsaOaep">Aes128_Sha256</option>
-                <option value="None">None (Без шифрования)</option>
-              </select>
+                onChange={setSecurityPolicy}
+                variant="light"
+                options={[
+                  { value: 'Basic256Sha256', label: 'Basic256Sha256' },
+                  { value: 'Aes128_Sha256_RsaOaep', label: 'Aes128_Sha256' },
+                  { value: 'None', label: 'None (Без шифрования)' },
+                ]}
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1 font-sans">
                 Режим сообщений
               </label>
-              <select
+              <CustomSelect
                 value={messageSecurityMode}
-                onChange={(e) => setMessageSecurityMode(e.target.value as OpcConnection['messageSecurityMode'])}
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs text-neutral-800 font-sans focus:outline-none focus:border-neutral-900"
-              >
-                <option value="SignAndEncrypt">SignAndEncrypt</option>
-                <option value="Sign">Sign</option>
-                <option value="None">None</option>
-              </select>
+                onChange={(val) => setMessageSecurityMode(val as OpcConnection['messageSecurityMode'])}
+                variant="light"
+                options={[
+                  { value: 'SignAndEncrypt', label: 'SignAndEncrypt' },
+                  { value: 'Sign', label: 'Sign' },
+                  { value: 'None', label: 'None' },
+                ]}
+              />
             </div>
           </div>
 
@@ -205,13 +210,14 @@ export const AddConnectionModal: React.FC<AddConnectionModalProps> = ({
             <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1 font-sans">
               Количество опрашиваемых тегов
             </label>
-            <input
-              type="number"
-              min="1"
-              max="10000"
+            <CustomNumberInput
+              min={1}
+              max={10000}
+              step={10}
               value={tagsCount}
-              onChange={(e) => setTagsCount(Number(e.target.value))}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-[8px] px-3 py-2 text-xs font-sans text-neutral-900 focus:outline-none focus:border-neutral-900"
+              onChange={(val) => setTagsCount(Number(val) || 0)}
+              variant="light"
+              placeholder="100"
             />
           </div>
 

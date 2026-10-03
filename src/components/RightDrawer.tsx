@@ -21,6 +21,8 @@ import {
   Broadcast,
   PencilSimple,
 } from '@phosphor-icons/react';
+import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomNumberInput } from '@/components/ui/CustomNumberInput';
 import type { OpcConnection, HardwareCategoryId } from '../types/opc';
 
 export interface DiscoveredDevice {
@@ -675,17 +677,18 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1 font-sans">
                       Модель ПЛК / Источник данных
                     </label>
-                    <select
+                    <CustomSelect
                       value={controllerType}
-                      onChange={(e) => setControllerType(e.target.value)}
-                      className="w-full bg-[#161822] border border-white/12 rounded-[8px] px-2.5 py-2 text-xs text-white font-sans focus:outline-none focus:border-violet-500 cursor-pointer"
-                    >
-                      <option value="Siemens S7-1200 / S7-1500 (TIA Portal)">Siemens S7-1200 / S7-1500 (TIA Portal)</option>
-                      <option value="Schneider Modicon M241 / M262">Schneider Modicon M241 / M262</option>
-                      <option value="Овен ПЛК210 / ПЛК200 (Codesys)">Овен ПЛК210 / ПЛК200 (Codesys)</option>
-                      <option value="Carel pCO / Холодильная автоматика">Carel pCO / Холодильная автоматика</option>
-                      <option value="Другой OPC UA сервер">Другой OPC UA сервер (FreeOpcUa / Kepware)</option>
-                    </select>
+                      onChange={setControllerType}
+                      variant="dark"
+                      options={[
+                        { value: 'Siemens S7-1200 / S7-1500 (TIA Portal)', label: 'Siemens S7-1200 / S7-1500 (TIA Portal)' },
+                        { value: 'Schneider Modicon M241 / M262', label: 'Schneider Modicon M241 / M262' },
+                        { value: 'Овен ПЛК210 / ПЛК200 (Codesys)', label: 'Овен ПЛК210 / ПЛК200 (Codesys)' },
+                        { value: 'Carel pCO / Холодильная автоматика', label: 'Carel pCO / Холодильная автоматика' },
+                        { value: 'Другой OPC UA сервер', label: 'Другой OPC UA сервер (FreeOpcUa / Kepware)' },
+                      ]}
+                    />
                   </div>
 
                   {/* Security Policy & Mode */}
@@ -694,30 +697,32 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                       <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1 font-sans">
                         Политика
                       </label>
-                      <select
+                      <CustomSelect
                         value={securityPolicy}
-                        onChange={(e) => setSecurityPolicy(e.target.value)}
-                        className="w-full bg-[#161822] border border-white/12 rounded-[8px] px-2 py-2 text-xs text-white font-sans focus:outline-none focus:border-violet-500 cursor-pointer"
-                      >
-                        <option value="Basic256Sha256">Basic256Sha256</option>
-                        <option value="Aes128_Sha256_RsaOaep">Aes128_Sha256</option>
-                        <option value="None">None (Без шифр.)</option>
-                      </select>
+                        onChange={setSecurityPolicy}
+                        variant="dark"
+                        options={[
+                          { value: 'Basic256Sha256', label: 'Basic256Sha256' },
+                          { value: 'Aes128_Sha256_RsaOaep', label: 'Aes128_Sha256' },
+                          { value: 'None', label: 'None (Без шифр.)' },
+                        ]}
+                      />
                     </div>
 
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1 font-sans">
                         Режим
                       </label>
-                      <select
+                      <CustomSelect
                         value={messageSecurityMode}
-                        onChange={(e) => setMessageSecurityMode(e.target.value as OpcConnection['messageSecurityMode'])}
-                        className="w-full bg-[#161822] border border-white/12 rounded-[8px] px-2 py-2 text-xs text-white font-sans focus:outline-none focus:border-violet-500 cursor-pointer"
-                      >
-                        <option value="SignAndEncrypt">SignAndEncrypt</option>
-                        <option value="Sign">Sign</option>
-                        <option value="None">None</option>
-                      </select>
+                        onChange={(val) => setMessageSecurityMode(val as OpcConnection['messageSecurityMode'])}
+                        variant="dark"
+                        options={[
+                          { value: 'SignAndEncrypt', label: 'SignAndEncrypt' },
+                          { value: 'Sign', label: 'Sign' },
+                          { value: 'None', label: 'None' },
+                        ]}
+                      />
                     </div>
                   </div>
 
@@ -726,13 +731,14 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                     <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1 font-sans">
                       Количество опрашиваемых тегов
                     </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10000"
+                    <CustomNumberInput
+                      min={1}
+                      max={10000}
+                      step={10}
                       value={tagsCount}
-                      onChange={(e) => setTagsCount(Number(e.target.value))}
-                      className="w-full bg-white/5 border border-white/12 rounded-[8px] px-3 py-2 text-xs font-sans text-white focus:outline-none focus:border-violet-500"
+                      onChange={(val) => setTagsCount(Number(val) || 0)}
+                      variant="dark"
+                      placeholder="100"
                     />
                   </div>
                 </form>
@@ -768,16 +774,19 @@ export const RightDrawer: React.FC<RightDrawerProps> = ({
                 <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-[8px] p-1.5">
                   <div className="relative flex-1 flex items-center gap-1.5 min-w-0 pl-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
-                    <select
-                      value={scanSubnet}
-                      onChange={(e) => setScanSubnet(e.target.value)}
-                      className="w-full bg-transparent text-xs text-neutral-200 font-mono focus:outline-none cursor-pointer truncate"
-                    >
-                      <option value="10.0.4.0/24 (Ethernet)" className="bg-[#12141c] text-white">10.0.4.0/24 (Ethernet)</option>
-                      <option value="LDS-сервер :4840" className="bg-[#12141c] text-white">LDS :4840 (Local Discovery)</option>
-                      <option value="mDNS / Zeroconf" className="bg-[#12141c] text-white">mDNS / Zeroconf (Multicast)</option>
-                      <option value="10.0.0.0/16" className="bg-[#12141c] text-white">10.0.0.0/16 (Заводская сеть)</option>
-                    </select>
+                    <div className="flex-1 min-w-0">
+                      <CustomSelect
+                        value={scanSubnet}
+                        onChange={setScanSubnet}
+                        variant="dark"
+                        options={[
+                          { value: '10.0.4.0/24 (Ethernet)', label: '10.0.4.0/24 (Ethernet)' },
+                          { value: 'LDS-сервер :4840', label: 'LDS :4840 (Local Discovery)' },
+                          { value: 'mDNS / Zeroconf', label: 'mDNS / Zeroconf (Multicast)' },
+                          { value: '10.0.0.0/16', label: '10.0.0.0/16 (Заводская сеть)' },
+                        ]}
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
