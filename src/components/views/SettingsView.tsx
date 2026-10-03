@@ -86,7 +86,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
       {/* Form Content: Segmented Bento Grid */}
       <form id="settings-form" onSubmit={handleSave} className="space-y-5 pb-4">
         {/* CARD 1: HERO DARK CARD — Основные параметры и сетевой стек */}
-        <div className="bg-[#0e0f14] text-white rounded-[18px] border border-white/10 p-6 sm:p-7 shadow-[0_12px_36px_rgba(14,15,20,0.18)] relative overflow-hidden select-none">
+        <div className="bg-[#0e0f14] text-white rounded-[18px] border border-white/10 p-6 sm:p-7 relative overflow-hidden select-none">
           {/* Subtle violet ambient glow in corner */}
           <div className="absolute right-0 top-0 w-96 h-full bg-gradient-to-l from-violet-600/15 via-violet-500/5 to-transparent pointer-events-none" />
 
