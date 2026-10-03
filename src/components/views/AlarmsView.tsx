@@ -21,6 +21,7 @@ import {
   Info,
   CaretDown,
 } from '@phosphor-icons/react';
+import { CustomSelect } from '@/components/ui/CustomSelect';
 
 export type AlarmSeverity = 'critical' | 'high' | 'warning' | 'info';
 export type AlarmState = 'active_unack' | 'active_acked' | 'cleared_unack' | 'cleared_acked';
@@ -488,20 +489,16 @@ export const AlarmsView: React.FC<AlarmsViewProps> = ({ onShowToast, onNavigateT
         </div>
 
         {/* Minimal Server Select Dropdown */}
-        <div className="relative shrink-0">
-          <select
+        <div className="shrink-0 min-w-[170px]">
+          <CustomSelect
             value={filterServer}
-            onChange={(e) => setFilterServer(e.target.value)}
-            className="bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200/80 rounded-[8px] pl-3 pr-7 py-2 text-xs font-medium focus:outline-none focus:border-neutral-400 cursor-pointer shadow-2xs appearance-none font-sans"
-          >
-            <option value="all">Все серверы ({alarms.length})</option>
-            {uniqueServers.map((srv) => (
-              <option key={srv} value={srv}>
-                {srv}
-              </option>
-            ))}
-          </select>
-          <CaretDown size={11} weight="bold" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+            onChange={setFilterServer}
+            variant="light"
+            options={[
+              { value: 'all', label: `Все серверы (${alarms.length})` },
+              ...uniqueServers.map((srv) => ({ value: srv, label: srv })),
+            ]}
+          />
         </div>
       </div>
 

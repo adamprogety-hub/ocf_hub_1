@@ -10,6 +10,8 @@ import {
   FloppyDisk,
   Warning,
 } from '@phosphor-icons/react';
+import { CustomSelect } from '@/components/ui/CustomSelect';
+import { CustomNumberInput } from '@/components/ui/CustomNumberInput';
 
 interface SettingsViewProps {
   onShowToast: (msg: string) => void;
@@ -106,11 +108,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
               <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Порт OPC UA по умолчанию
               </label>
-              <input
-                type="number"
+              <CustomNumberInput
                 value={defaultPort}
-                onChange={(e) => setDefaultPort(e.target.value)}
-                className="w-full bg-white/5 border border-white/12 rounded-[8px] px-3.5 py-2.5 text-xs font-sans text-white focus:outline-none focus:border-violet-500 focus:bg-white/10 transition-all"
+                onChange={setDefaultPort}
+                min={1}
+                max={65535}
+                step={1}
+                variant="dark"
                 placeholder="4840"
               />
               <span className="block text-[10px] text-neutral-500 mt-1">Стандарт IANA: TCP 4840</span>
@@ -120,11 +124,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
               <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Тайм-аут Discovery (мс)
               </label>
-              <input
-                type="number"
+              <CustomNumberInput
                 value={discoveryTimeout}
-                onChange={(e) => setDiscoveryTimeout(e.target.value)}
-                className="w-full bg-white/5 border border-white/12 rounded-[8px] px-3.5 py-2.5 text-xs font-sans text-white focus:outline-none focus:border-violet-500 focus:bg-white/10 transition-all"
+                onChange={setDiscoveryTimeout}
+                min={100}
+                max={60000}
+                step={500}
+                variant="dark"
                 placeholder="3000"
               />
               <span className="block text-[10px] text-neutral-500 mt-1">Ожидание ответа FindServers</span>
@@ -134,11 +140,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
               <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Интервал Keep-Alive (мс)
               </label>
-              <input
-                type="number"
+              <CustomNumberInput
                 value={keepAliveInterval}
-                onChange={(e) => setKeepAliveInterval(e.target.value)}
-                className="w-full bg-white/5 border border-white/12 rounded-[8px] px-3.5 py-2.5 text-xs font-sans text-white focus:outline-none focus:border-violet-500 focus:bg-white/10 transition-all"
+                onChange={setKeepAliveInterval}
+                min={500}
+                max={120000}
+                step={1000}
+                variant="dark"
                 placeholder="5000"
               />
               <span className="block text-[10px] text-neutral-500 mt-1">Пинг активности сессии</span>
@@ -148,11 +156,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
               <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Макс. размер пакета (МБ)
               </label>
-              <input
-                type="number"
+              <CustomNumberInput
                 value={maxMessageSize}
-                onChange={(e) => setMaxMessageSize(e.target.value)}
-                className="w-full bg-white/5 border border-white/12 rounded-[8px] px-3.5 py-2.5 text-xs font-sans text-white focus:outline-none focus:border-violet-500 focus:bg-white/10 transition-all"
+                onChange={setMaxMessageSize}
+                min={1}
+                max={128}
+                step={1}
+                variant="dark"
                 placeholder="16"
               />
               <span className="block text-[10px] text-neutral-500 mt-1">Предел фрагментации TCP</span>
@@ -204,11 +214,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
                     Интервал (мс)
                   </label>
-                  <input
-                    type="number"
+                  <CustomNumberInput
                     value={publishingInterval}
-                    onChange={(e) => setPublishingInterval(e.target.value)}
-                    className="w-full bg-[#f8fafd] border border-neutral-200/80 rounded-[8px] px-3 py-2 text-xs font-sans text-neutral-900 focus:outline-none focus:border-violet-600 focus:bg-white transition-all"
+                    onChange={setPublishingInterval}
+                    min={50}
+                    max={10000}
+                    step={50}
+                    variant="light"
+                    placeholder="250"
                   />
                   <span className="block text-[10px] text-neutral-400 mt-1">Publishing</span>
                 </div>
@@ -217,11 +230,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
                     Макс. тегов
                   </label>
-                  <input
-                    type="number"
+                  <CustomNumberInput
                     value={maxMonitoredItems}
-                    onChange={(e) => setMaxMonitoredItems(e.target.value)}
-                    className="w-full bg-[#f8fafd] border border-neutral-200/80 rounded-[8px] px-3 py-2 text-xs font-sans text-neutral-900 focus:outline-none focus:border-violet-600 focus:bg-white transition-all"
+                    onChange={setMaxMonitoredItems}
+                    min={10}
+                    max={50000}
+                    step={100}
+                    variant="light"
+                    placeholder="1000"
                   />
                   <span className="block text-[10px] text-neutral-400 mt-1">В подписке</span>
                 </div>
@@ -230,11 +246,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
                     Очередь (Queue)
                   </label>
-                  <input
-                    type="number"
+                  <CustomNumberInput
                     value={queueSize}
-                    onChange={(e) => setQueueSize(e.target.value)}
-                    className="w-full bg-[#f8fafd] border border-neutral-200/80 rounded-[8px] px-3 py-2 text-xs font-sans text-neutral-900 focus:outline-none focus:border-violet-600 focus:bg-white transition-all"
+                    onChange={setQueueSize}
+                    min={1}
+                    max={1000}
+                    step={5}
+                    variant="light"
+                    placeholder="10"
                   />
                   <span className="block text-[10px] text-neutral-400 mt-1">Семплов</span>
                 </div>
@@ -283,16 +302,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onShowToast }) => {
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1.5">
                   Уровень логирования (Log Level)
                 </label>
-                <select
+                <CustomSelect
                   value={logLevel}
-                  onChange={(e) => setLogLevel(e.target.value)}
-                  className="w-full bg-[#f8fafd] border border-neutral-200/80 rounded-[8px] px-3.5 py-2.5 text-xs font-sans text-neutral-900 focus:outline-none focus:border-violet-600 focus:bg-white transition-all cursor-pointer"
-                >
-                  <option value="Debug">Debug (Все пакеты и транзакции TCP)</option>
-                  <option value="Info">Info (Штатные события и подключения)</option>
-                  <option value="Warn">Warn (Предупреждения и задержки)</option>
-                  <option value="Error">Error (Только критические сбои)</option>
-                </select>
+                  onChange={setLogLevel}
+                  variant="light"
+                  options={[
+                    { value: 'Debug', label: 'Debug (Все пакеты и транзакции TCP)' },
+                    { value: 'Info', label: 'Info (Штатные события и подключения)' },
+                    { value: 'Warn', label: 'Warn (Предупреждения и задержки)' },
+                    { value: 'Error', label: 'Error (Только критические сбои)' },
+                  ]}
+                />
               </div>
             </div>
 
