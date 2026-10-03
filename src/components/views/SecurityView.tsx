@@ -132,7 +132,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
         <div className="relative z-10 w-[300px] sm:w-[340px] md:w-[360px] bg-emerald-500 text-neutral-950 rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 select-none">
           <div>
             <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-950/80 font-sans block mb-1">
-              Активен (Client Instance)
+              Активен
             </span>
             <h3 className="text-base font-black text-neutral-950 font-heading tracking-tight truncate">
               OCF Studio Client Instance
@@ -142,10 +142,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
             </p>
           </div>
 
-          <div className="mt-3.5 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-            <span className="text-[11px] text-emerald-950/70 font-sans font-medium">
-              Формат X.509 v3
-            </span>
+          <div className="mt-3.5 flex items-center justify-end text-xs font-sans">
             <button
               type="button"
               onClick={() => onShowToast('Сертификат клиента выгружен в .der')}
@@ -161,7 +158,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
         <div className="relative z-10 w-[300px] sm:w-[340px] md:w-[360px] bg-amber-400 text-neutral-950 rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 select-none">
           <div>
             <span className="text-[10px] uppercase font-bold tracking-wider text-amber-950/80 font-sans block mb-1">
-              Скоро истекает (14 дней)
+              Скоро истекает
             </span>
             <h3 className="text-base font-black text-neutral-950 font-heading tracking-tight truncate">
               Siemens S7-1500 Gateway
@@ -171,10 +168,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
             </p>
           </div>
 
-          <div className="mt-3.5 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-            <span className="text-[11px] text-amber-950/70 font-sans font-medium">
-              Требуется продление
-            </span>
+          <div className="mt-3.5 flex items-center justify-end text-xs font-sans">
             <button
               type="button"
               onClick={() => onShowToast('Запрос на продление сертификата отправлен в CA')}
@@ -190,7 +184,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
         <div className="relative z-10 w-[300px] sm:w-[340px] md:w-[360px] bg-rose-500 text-neutral-950 rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 select-none">
           <div>
             <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-950/80 font-sans block mb-1">
-              В карантине (Untrusted)
+              В карантине
             </span>
             <h3 className="text-base font-black text-neutral-950 font-heading tracking-tight truncate">
               Beckhoff CX5140 PLC
@@ -200,10 +194,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
             </p>
           </div>
 
-          <div className="mt-3.5 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-            <span className="text-[11px] text-neutral-950/70 font-sans font-medium">
-              Самоподписанный
-            </span>
+          <div className="mt-3.5 flex items-center justify-end text-xs font-sans">
             <button
               type="button"
               onClick={() => handleTrustCertificate('cert-quarantine-1', 'Beckhoff CX5140 PLC')}
@@ -219,7 +210,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
         <div className="relative z-10 w-[300px] sm:w-[340px] md:w-[360px] bg-sky-400 text-neutral-950 rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 select-none">
           <div>
             <span className="text-[10px] uppercase font-bold tracking-wider text-sky-950/80 font-sans block mb-1">
-              Корневой центр (Root CA)
+              Корневой центр
             </span>
             <h3 className="text-base font-black text-neutral-950 font-heading tracking-tight truncate">
               Industrial Trust Root Authority
@@ -229,10 +220,7 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
             </p>
           </div>
 
-          <div className="mt-3.5 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-            <span className="text-[11px] text-sky-950/70 font-sans font-medium">
-              Цепочка доверия
-            </span>
+          <div className="mt-3.5 flex items-center justify-end text-xs font-sans">
             <button
               type="button"
               onClick={() => onShowToast('Корневой сертификат экспортирован в .pem')}
