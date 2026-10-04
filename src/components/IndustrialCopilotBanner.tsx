@@ -523,7 +523,7 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
           isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
         } ${
           isExpanded
-            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto shadow-[0_24px_60px_rgba(0,0,0,0.65)]'
+            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
             : 'opacity-0 translate-y-8 scale-[0.97] pointer-events-none'
         }`}
       >
@@ -812,28 +812,28 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
           </div>
 
           {/* ----------------------------------------------------------------------- */}
-          {/* FOOTER: Input Bar with Attachment Trigger (Documents & Photos)          */}
+          {/* FOOTER: Crisp White Island Input Bar (Maximum Contrast & Clean Rhythm)  */}
           {/* ----------------------------------------------------------------------- */}
           <div className="relative z-20 px-5 sm:px-6 pb-4 pt-2 shrink-0">
             {/* Pending Attachments Strip */}
             {pendingAttachments.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2 animate-in fade-in duration-150">
+              <div className="mb-2.5 flex flex-wrap gap-2 animate-in fade-in duration-150">
                 {pendingAttachments.map((file) => (
                   <div
                     key={file.id}
-                    className="flex items-center gap-2 bg-[#191b26] border border-white/12 rounded-[8px] pl-2 pr-1.5 py-1 text-xs text-white shadow-sm"
+                    className="flex items-center gap-2 bg-white/95 border border-white/20 rounded-[8px] pl-2.5 pr-2 py-1 text-xs text-[#0f172a] shadow-md backdrop-blur-md"
                   >
                     {file.type === 'image' ? (
-                      <ImageIcon size={14} weight="light" className="text-violet-400" />
+                      <ImageIcon size={14} weight="bold" className="text-violet-600" />
                     ) : (
-                      <FileText size={14} weight="light" className="text-blue-400" />
+                      <FileText size={14} weight="bold" className="text-blue-600" />
                     )}
-                    <span className="max-w-[120px] truncate text-[11px]">{file.name}</span>
-                    <span className="text-[9px] text-neutral-400">{file.size}</span>
+                    <span className="max-w-[130px] truncate text-[11px] font-semibold">{file.name}</span>
+                    <span className="text-[10px] text-neutral-400 font-mono">{file.size}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveAttachment(file.id)}
-                      className="p-1 hover:text-rose-400 text-neutral-400 cursor-pointer"
+                      className="p-1 hover:text-rose-600 text-neutral-400 cursor-pointer transition-colors"
                       title="Удалить"
                     >
                       <X size={11} weight="bold" />
@@ -848,13 +848,13 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
                 e.preventDefault();
                 handleSendPrompt(inputQuery);
               }}
-              className="flex items-center gap-2.5 bg-[#13151d]/90 backdrop-blur-md border border-white/10 rounded-[12px] px-3.5 py-2.5 focus-within:border-violet-500/60 focus-within:ring-1 focus-within:ring-violet-500/20 transition-all shadow-lg shadow-black/25"
+              className="flex items-center gap-2.5 bg-white rounded-[13px] px-3.5 py-2.5 shadow-[0_10px_28px_rgba(0,0,0,0.35)] focus-within:ring-2 focus-within:ring-violet-500/40 transition-all border border-white/80"
             >
               {/* Paperclip attachment button */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="tactile-btn p-1.5 rounded-[6px] hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                className="tactile-btn p-1.5 rounded-[7px] hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer shrink-0"
                 title="Прикрепить документы или фотографии"
               >
                 <Paperclip size={16} weight="light" />
@@ -866,7 +866,7 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
                 placeholder="Задайте вопрос, загрузите схему/паспорт оборудования или фото узла..."
-                className="bg-transparent text-xs text-white placeholder:text-neutral-500 outline-none w-full font-sans"
+                className="bg-transparent text-xs text-[#0f172a] placeholder:text-neutral-400 outline-none w-full font-sans font-medium"
               />
 
               <button
@@ -874,8 +874,8 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
                 disabled={(!inputQuery.trim() && pendingAttachments.length === 0) || isTyping}
                 className={`w-7 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer shrink-0 ${
                   (inputQuery.trim() || pendingAttachments.length > 0) && !isTyping
-                    ? 'bg-violet-600 hover:bg-violet-500 text-white shadow-sm hover:scale-105 active:scale-95'
-                    : 'bg-white/5 text-neutral-500 cursor-not-allowed'
+                    ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-xs hover:scale-105 active:scale-95'
+                    : 'bg-neutral-100 text-neutral-300 cursor-not-allowed'
                 }`}
                 title="Отправить (Enter)"
               >
