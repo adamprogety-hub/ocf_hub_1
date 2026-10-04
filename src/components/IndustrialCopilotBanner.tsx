@@ -466,19 +466,65 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
         className="hidden"
       />
 
+      {/* Spacer in document flow so category cards don't shift when banner is expanded */}
+      <div className="h-[56px] shrink-0 mt-3 select-none pointer-events-none" />
+
       {/* ========================================================================= */}
-      {/* 1. COLLAPSED DOCKED BAR (At the bottom of the page)                        */}
+      {/* UNIFIED PHYSICAL MORPHING ISLAND (Expands upwards from 56px to 100%)       */}
       {/* ========================================================================= */}
       <div
-        className={`relative z-10 shrink-0 mt-3 select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          handleFileUpload(e.dataTransfer.files);
+        }}
+        style={{
+          transition: 'all 440ms cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+        className={`absolute left-0 right-0 bottom-0 z-40 bg-[#0c0d12] text-white overflow-hidden select-none border ${
+          isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
+        } ${
           isExpanded
-            ? 'opacity-0 scale-[0.98] pointer-events-none'
-            : 'opacity-100 scale-100 pointer-events-auto'
+            ? 'top-0 rounded-[16px]'
+            : 'top-[calc(100%-56px)] rounded-[14px] hover:border-violet-500/40 hover:bg-[#11131c] cursor-pointer shadow-sm'
         }`}
       >
+        {/* Living Orbital Blurred Background Circles (Violet & Radiant Orange) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[inherit] z-0">
+          {/* Orbital Circle 1: Deep Violet Aurora */}
+          <div
+            className="animate-orbit-violet absolute top-0 -right-8 w-[520px] h-[520px] filter blur-[80px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.85) 0%, rgba(139, 92, 246, 0.55) 45%, rgba(99, 102, 241, 0.18) 75%, transparent 100%)',
+            }}
+          />
+
+          {/* Orbital Circle 2: Warm Radiant Orange */}
+          <div
+            className="animate-orbit-orange absolute bottom-0 -left-6 w-[500px] h-[500px] filter blur-[80px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 50%, rgba(255, 120, 0, 0.85) 0%, rgba(249, 115, 22, 0.55) 45%, rgba(251, 146, 60, 0.18) 75%, transparent 100%)',
+            }}
+          />
+        </div>
+
+        {/* ----------------------------------------------------------------------- */}
+        {/* 1. COLLAPSED VIEW LAYER (Crossfades out as panel morphs upwards)         */}
+        {/* ----------------------------------------------------------------------- */}
         <div
-          onClick={() => setIsExpanded(true)}
-          className="group h-[56px] rounded-[14px] bg-[#0c0d12] hover:bg-[#11131c] border border-white/10 hover:border-violet-500/40 transition-all duration-200 px-3.5 sm:px-4 flex items-center justify-between gap-3 cursor-pointer shadow-sm"
+          onClick={() => !isExpanded && setIsExpanded(true)}
+          className={`absolute inset-x-0 bottom-0 h-[56px] px-3.5 sm:px-4 flex items-center justify-between gap-3 z-30 transition-all duration-200 ${
+            isExpanded
+              ? 'opacity-0 pointer-events-none -translate-y-2'
+              : 'opacity-100 pointer-events-auto translate-y-0 cursor-pointer'
+          }`}
         >
           {/* Left: Clean Greeting Input Trigger (No avatars or logos) */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -502,56 +548,19 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ========================================================================= */}
-      {/* 2. EXPANDED DIALOG (Opens upwards with smooth aesthetic cubic-bezier)      */}
-      {/*    Continuous living background with pure CSS mask-image fade!            */}
-      {/* ========================================================================= */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsDragging(false);
-          handleFileUpload(e.dataTransfer.files);
-        }}
-        className={`absolute inset-0 z-40 bg-[#0c0d12] text-white rounded-[16px] border flex flex-col justify-between overflow-hidden select-none transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
-        } ${
-          isExpanded
-            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
-            : 'opacity-0 translate-y-8 scale-[0.97] pointer-events-none'
-        }`}
-      >
-        {/* Living Orbital Blurred Background Circles (Violet & Radiant Orange) */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[16px] z-0">
-          {/* Orbital Circle 1: Deep Violet Aurora (Orbits in circle & gently pulses) */}
-          <div
-            className="animate-orbit-violet absolute top-0 -right-8 w-[520px] h-[520px] filter blur-[80px] pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.85) 0%, rgba(139, 92, 246, 0.55) 45%, rgba(99, 102, 241, 0.18) 75%, transparent 100%)',
-            }}
-          />
-
-          {/* Orbital Circle 2: Warm Radiant Orange (Orbits in circle & gently pulses) */}
-          <div
-            className="animate-orbit-orange absolute bottom-0 -left-6 w-[500px] h-[500px] filter blur-[80px] pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 50%, rgba(255, 120, 0, 0.85) 0%, rgba(249, 115, 22, 0.55) 45%, rgba(251, 146, 60, 0.18) 75%, transparent 100%)',
-            }}
-          />
-        </div>
-
-          {/* ----------------------------------------------------------------------- */}
-          {/* HEADER: Pure Minimalist Title + Multi-Dialog Switcher                   */}
-          {/* ----------------------------------------------------------------------- */}
-          <div className="relative z-30 px-5 sm:px-6 py-4 flex items-center justify-between shrink-0">
+        {/* ----------------------------------------------------------------------- */}
+        {/* 2. EXPANDED FULL DIALOG LAYER (Cascading entrance when opening)          */}
+        {/* ----------------------------------------------------------------------- */}
+        <div
+          className={`h-full flex flex-col justify-between relative z-20 transition-all duration-300 ${
+            isExpanded
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          {/* HEADER: Pure Minimalist Title + Multi-Dialog Switcher */}
+          <div className={`relative z-30 px-5 sm:px-6 py-4 flex items-center justify-between shrink-0 ${isExpanded ? 'animate-copilot-header' : ''}`}>
             {/* Left: OCF Copilot + Multi-Chat Switcher */}
             <div className="flex items-center gap-3">
               <span className="font-heading font-black text-sm tracking-tight text-white select-none">
@@ -678,31 +687,47 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
           >
             {/* If no messages yet: Pure Clean greeting without avatars or logos */}
             {messages.length === 0 && (
-              <div className="h-full flex flex-col justify-center max-w-lg mx-auto py-6 text-center animate-in fade-in duration-300">
-                <h2 className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight mb-2">
+              <div className="h-full flex flex-col justify-center max-w-lg mx-auto py-6 text-center">
+                <h2 className={`font-heading font-black text-2xl sm:text-3xl text-white tracking-tight mb-2 ${isExpanded ? 'animate-copilot-greeting' : ''}`}>
                   Привет, какой план на сегодня?
                 </h2>
-                <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6">
+                <p
+                  className={`text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6 ${isExpanded ? 'animate-copilot-greeting' : ''}`}
+                  style={{ animationDelay: '200ms' }}
+                >
                   Задайте вопрос по подключению ПЛК, политикам шифрования X.509 или загрузите схему/паспорт оборудования:
                 </p>
 
-                {/* Minimal clean starter chips */}
+                {/* Minimal clean starter chips (Cascading Stagger) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left">
-                  {QUICK_STARTERS.map((item, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSendPrompt(item.query)}
-                      className="tactile-btn p-3 rounded-[12px] bg-white/[0.04] hover:bg-violet-600/15 border border-white/8 hover:border-violet-500/40 text-neutral-200 hover:text-white text-xs font-sans transition-all cursor-pointer flex items-center justify-between group"
-                    >
-                      <span className="font-medium tracking-tight">{item.chip}</span>
-                      <ArrowRight
-                        size={13}
-                        weight="bold"
-                        className="text-neutral-500 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
-                      />
-                    </button>
-                  ))}
+                  {QUICK_STARTERS.map((item, idx) => {
+                    const animClass =
+                      idx === 0
+                        ? 'animate-copilot-chip-1'
+                        : idx === 1
+                        ? 'animate-copilot-chip-2'
+                        : idx === 2
+                        ? 'animate-copilot-chip-3'
+                        : 'animate-copilot-chip-4';
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSendPrompt(item.query)}
+                        className={`tactile-btn p-3 rounded-[12px] bg-white/[0.04] hover:bg-violet-600/15 border border-white/8 hover:border-violet-500/40 text-neutral-200 hover:text-white text-xs font-sans transition-all cursor-pointer flex items-center justify-between group ${
+                          isExpanded ? animClass : ''
+                        }`}
+                      >
+                        <span className="font-medium tracking-tight">{item.chip}</span>
+                        <ArrowRight
+                          size={13}
+                          weight="bold"
+                          className="text-neutral-500 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -814,7 +839,7 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
           {/* ----------------------------------------------------------------------- */}
           {/* FOOTER: Input Bar with Attachment Trigger (Documents & Photos)          */}
           {/* ----------------------------------------------------------------------- */}
-          <div className="relative z-20 px-5 sm:px-6 pb-4 pt-2 shrink-0">
+          <div className={`relative z-20 px-5 sm:px-6 pb-4 pt-2 shrink-0 ${isExpanded ? 'animate-copilot-input' : ''}`}>
             {/* Pending Attachments Strip */}
             {pendingAttachments.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2 animate-in fade-in duration-150">
@@ -884,6 +909,7 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
             </form>
           </div>
         </div>
+      </div>
     </>
   );
 };

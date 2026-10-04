@@ -269,3 +269,58 @@
   will-change: transform, opacity;
 }
 
+/* ========================================================================= */
+/* Copilot Cascading Orchestration Keyframes (Awwwards / Cinema Stagger)     */
+/* ========================================================================= */
+
+@keyframes copilotFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes copilotHeaderIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-copilot-header {
+  animation: copilotHeaderIn 320ms var(--ease-apple-spring) 100ms both;
+}
+
+.animate-copilot-greeting {
+  animation: copilotFadeSlideUp 380ms var(--ease-apple-spring) 150ms both;
+}
+
+.animate-copilot-chip-1 {
+  animation: copilotFadeSlideUp 340ms var(--ease-apple-spring) 210ms both;
+}
+
+.animate-copilot-chip-2 {
+  animation: copilotFadeSlideUp 340ms var(--ease-apple-spring) 250ms both;
+}
+
+.animate-copilot-chip-3 {
+  animation: copilotFadeSlideUp 340ms var(--ease-apple-spring) 290ms both;
+}
+
+.animate-copilot-chip-4 {
+  animation: copilotFadeSlideUp 340ms var(--ease-apple-spring) 330ms both;
+}
+
+.animate-copilot-input {
+  animation: copilotFadeSlideUp 380ms var(--ease-apple-spring) 200ms both;
+}
+
+
