@@ -469,10 +469,16 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
       {/* ========================================================================= */}
       {/* 1. COLLAPSED DOCKED BAR (At the bottom of the page)                        */}
       {/* ========================================================================= */}
-      <div className="relative z-10 shrink-0 mt-3 select-none">
+      <div
+        className={`relative z-10 shrink-0 mt-3 select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isExpanded
+            ? 'opacity-0 scale-[0.98] pointer-events-none'
+            : 'opacity-100 scale-100 pointer-events-auto'
+        }`}
+      >
         <div
           onClick={() => setIsExpanded(true)}
-          className="group h-[56px] rounded-[14px] bg-[#0c0d12] hover:bg-[#11131c] border border-white/10 hover:border-violet-500/40 transition-all duration-200 px-3.5 sm:px-4 flex items-center justify-between gap-3 cursor-pointer"
+          className="group h-[56px] rounded-[14px] bg-[#0c0d12] hover:bg-[#11131c] border border-white/10 hover:border-violet-500/40 transition-all duration-200 px-3.5 sm:px-4 flex items-center justify-between gap-3 cursor-pointer shadow-sm"
         >
           {/* Left: Clean Greeting Input Trigger (No avatars or logos) */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -499,45 +505,48 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. EXPANDED DIALOG (Opens upwards with EQUAL OFFSETS from outer canvas)   */}
+      {/* 2. EXPANDED DIALOG (Opens upwards with smooth aesthetic cubic-bezier)      */}
       {/*    Continuous living background with pure CSS mask-image fade!            */}
       {/* ========================================================================= */}
-      {isExpanded && (
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragging(false);
-            handleFileUpload(e.dataTransfer.files);
-          }}
-          className={`absolute inset-0 z-40 bg-[#0c0d12] text-white rounded-[16px] border ${
-            isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
-          } flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-240 ease-[cubic-bezier(0.16,1,0.3,1)] select-none`}
-        >
-          {/* Two Living, Flowing Amorphous Fluid Textures (Zero cut-off rectangles!) */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[16px] z-0">
-            {/* Amorphous Blob 1: Deep Violet & Indigo Aurora */}
-            <div
-              className="animate-blob-1 absolute -top-20 -right-20 w-[460px] h-[460px] filter blur-[75px] opacity-30 pointer-events-none"
-              style={{
-                background:
-                  'radial-gradient(circle at 45% 45%, rgba(139, 92, 246, 0.75) 0%, rgba(99, 102, 241, 0.45) 45%, rgba(67, 56, 202, 0.1) 75%, transparent 100%)',
-              }}
-            />
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          handleFileUpload(e.dataTransfer.files);
+        }}
+        className={`absolute inset-0 z-40 bg-[#0c0d12] text-white rounded-[16px] border flex flex-col justify-between overflow-hidden select-none transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
+        } ${
+          isExpanded
+            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto shadow-[0_24px_60px_rgba(0,0,0,0.65)]'
+            : 'opacity-0 translate-y-8 scale-[0.97] pointer-events-none'
+        }`}
+      >
+        {/* Living Orbital Blurred Background Circles (Violet & Radiant Orange) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[16px] z-0">
+          {/* Orbital Circle 1: Deep Violet Aurora (Orbits in circle & gently pulses) */}
+          <div
+            className="animate-orbit-violet absolute top-0 -right-8 w-[520px] h-[520px] filter blur-[80px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.85) 0%, rgba(139, 92, 246, 0.55) 45%, rgba(99, 102, 241, 0.18) 75%, transparent 100%)',
+            }}
+          />
 
-            {/* Amorphous Blob 2: Cyan & Electric Blue Nebula */}
-            <div
-              className="animate-blob-2 absolute -bottom-24 -left-20 w-[500px] h-[500px] filter blur-[85px] opacity-25 pointer-events-none"
-              style={{
-                background:
-                  'radial-gradient(circle at 55% 55%, rgba(56, 189, 248, 0.6) 0%, rgba(79, 70, 229, 0.38) 45%, rgba(124, 58, 237, 0.1) 75%, transparent 100%)',
-              }}
-            />
-          </div>
+          {/* Orbital Circle 2: Warm Radiant Orange (Orbits in circle & gently pulses) */}
+          <div
+            className="animate-orbit-orange absolute bottom-0 -left-6 w-[500px] h-[500px] filter blur-[80px] pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 50%, rgba(255, 120, 0, 0.85) 0%, rgba(249, 115, 22, 0.55) 45%, rgba(251, 146, 60, 0.18) 75%, transparent 100%)',
+            }}
+          />
+        </div>
 
           {/* ----------------------------------------------------------------------- */}
           {/* HEADER: Pure Minimalist Title + Multi-Dialog Switcher                   */}
@@ -875,7 +884,6 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
             </form>
           </div>
         </div>
-      )}
     </>
   );
 };
