@@ -341,55 +341,31 @@ export const SecurityView: React.FC<SecurityViewProps> = ({ onShowToast }) => {
         ) : (
           /* Encryption Policies Specs */
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
-            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-4 flex flex-col justify-between">
-              <div>
-                <span className="bg-violet-100 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded font-sans uppercase">
-                  Рекомендовано
-                </span>
-                <h4 className="text-sm font-black text-[#0f172a] font-heading mt-2">
-                  Basic256Sha256
-                </h4>
-                <p className="text-xs text-neutral-500 font-sans mt-1 leading-relaxed">
-                  Асимметричное шифрование RSA-OAEP, подпись SHA-256, симметричное шифрование AES-256-CBC.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-neutral-200/60 text-xs font-bold text-emerald-700">
-                Максимальный промышленный уровень
-              </div>
+            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-5 flex flex-col justify-start">
+              <h4 className="text-sm font-black text-[#0f172a] font-heading">
+                Basic256Sha256
+              </h4>
+              <p className="text-xs text-neutral-500 font-sans mt-1.5 leading-relaxed">
+                Асимметричное шифрование RSA-OAEP, подпись SHA-256, симметричное шифрование AES-256-CBC.
+              </p>
             </div>
 
-            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-4 flex flex-col justify-between">
-              <div>
-                <span className="bg-neutral-100 text-neutral-700 text-[10px] font-bold px-2 py-0.5 rounded font-sans uppercase">
-                  Стандарт
-                </span>
-                <h4 className="text-sm font-black text-[#0f172a] font-heading mt-2">
-                  Aes128_Sha256_RsaOaep
-                </h4>
-                <p className="text-xs text-neutral-500 font-sans mt-1 leading-relaxed">
-                  Оптимизированный профиль для энергоэффективных контроллеров с умеренной вычислительной мощностью.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-neutral-200/60 text-xs font-bold text-neutral-600">
-                Поддерживается 100% контроллеров
-              </div>
+            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-5 flex flex-col justify-start">
+              <h4 className="text-sm font-black text-[#0f172a] font-heading">
+                Aes128_Sha256_RsaOaep
+              </h4>
+              <p className="text-xs text-neutral-500 font-sans mt-1.5 leading-relaxed">
+                Оптимизированный профиль для энергоэффективных контроллеров с умеренной вычислительной мощностью.
+              </p>
             </div>
 
-            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-4 flex flex-col justify-between">
-              <div>
-                <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded font-sans uppercase">
-                  Только отладка
-                </span>
-                <h4 className="text-sm font-black text-[#0f172a] font-heading mt-2">
-                  SecurityMode: None
-                </h4>
-                <p className="text-xs text-neutral-500 font-sans mt-1 leading-relaxed">
-                  Передача без шифрования открытым текстом. Допускается только в изолированных тестовых стендах.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-neutral-200/60 text-xs font-bold text-orange-600">
-                Небезопасно для рабочего контура
-              </div>
+            <div className="bg-[#f8fafd] border border-neutral-200/70 rounded-[12px] p-5 flex flex-col justify-start">
+              <h4 className="text-sm font-black text-[#0f172a] font-heading">
+                SecurityMode: None
+              </h4>
+              <p className="text-xs text-neutral-500 font-sans mt-1.5 leading-relaxed">
+                Передача без шифрования открытым текстом. Допускается только в изолированных тестовых стендах.
+              </p>
             </div>
           </div>
         )}
