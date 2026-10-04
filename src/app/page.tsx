@@ -7,7 +7,7 @@ import { CategoryCard } from '@/components/CategoryCard';
 import { ConnectionCard } from '@/components/ConnectionCard';
 import { AddConnectionCard } from '@/components/AddConnectionCard';
 import { FindConnectionCard } from '@/components/FindConnectionCard';
-import { DiscoveryBanner } from '@/components/DiscoveryBanner';
+import { IndustrialCopilotBanner } from '@/components/IndustrialCopilotBanner';
 import { RightDrawer } from '@/components/RightDrawer';
 import { AddressSpaceView } from '@/components/views/AddressSpaceView';
 import { MonitorTrendsView } from '@/components/views/MonitorTrendsView';
@@ -257,8 +257,12 @@ export default function Home() {
                             </div>
                           </div>
 
-                          {/* Bottom Large Dark Discovery Banner with Quick Start Link (Only on root view) */}
-                          <DiscoveryBanner />
+                          {/* Bottom Dark Industrial AI Copilot Dialog (Replaces static Quick Start) */}
+                          <IndustrialCopilotBanner
+                            onNavigateTab={handleTabChange}
+                            onSelectCategory={(cat) => setSelectedCategory(cat)}
+                            onShowToast={showToast}
+                          />
                         </>
                       ) : (
                         /* LEVEL 2: Drilled-down Category View */
