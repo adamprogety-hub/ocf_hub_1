@@ -467,10 +467,10 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
       />
 
       {/* Spacer in document flow so category cards don't shift when banner is expanded */}
-      <div className="h-[56px] shrink-0 mt-3 select-none pointer-events-none" />
+      <div className="h-[88px] shrink-0 mt-3 select-none pointer-events-none" />
 
       {/* ========================================================================= */}
-      {/* UNIFIED PHYSICAL MORPHING ISLAND (Expands upwards from 56px to 100%)       */}
+      {/* UNIFIED PHYSICAL MORPHING ISLAND (Expands upwards from 88px to 100%)       */}
       {/* ========================================================================= */}
       <div
         onDragOver={(e) => {
@@ -486,12 +486,12 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
         style={{
           transition: 'all 440ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
-        className={`absolute left-0 right-0 bottom-0 z-40 bg-[#0c0d12] text-white overflow-hidden select-none border ${
+        className={`absolute left-0 right-0 bottom-0 z-40 bg-[#0c0d12] text-white select-none border transition-all group ${
           isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
         } ${
           isExpanded
-            ? 'top-0 rounded-[16px]'
-            : 'top-[calc(100%-56px)] rounded-[14px] hover:border-violet-500/40 hover:bg-[#11131c] cursor-pointer shadow-sm'
+            ? 'top-0 rounded-[16px] overflow-hidden'
+            : 'top-[calc(100%-88px)] rounded-[16px] overflow-visible hover:border-violet-500/40 hover:bg-[#11131c] cursor-pointer shadow-sm'
         }`}
       >
         {/* Living Orbital Blurred Background Circles (Violet & Radiant Orange) */}
@@ -520,32 +520,44 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
         {/* ----------------------------------------------------------------------- */}
         <div
           onClick={() => !isExpanded && setIsExpanded(true)}
-          className={`absolute inset-x-0 bottom-0 h-[56px] px-3.5 sm:px-4 flex items-center justify-between gap-3 z-30 transition-all duration-200 ${
+          className={`absolute inset-x-0 bottom-0 h-[88px] px-6 sm:px-7 flex items-center justify-between gap-4 z-30 transition-all duration-200 ${
             isExpanded
               ? 'opacity-0 pointer-events-none -translate-y-2'
               : 'opacity-100 pointer-events-auto translate-y-0 cursor-pointer'
           }`}
         >
-          {/* Left: Clean Greeting Input Trigger (No avatars or logos) */}
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-bold text-white font-heading tracking-tight truncate">
-                Привет, какой план на сегодня?
-              </span>
-              <span className="text-[11px] text-neutral-400 font-sans tracking-tight truncate">
-                Спросите ассистента, загрузите схему или выберите быстрый сценарий...
-              </span>
-            </div>
+          {/* Left: Clean Greeting Input Trigger */}
+          <div className="max-w-xs sm:max-w-sm md:max-w-md shrink-0 z-20">
+            <h3 className="text-base sm:text-lg font-extrabold tracking-tight font-heading text-white">
+              Привет, какой план на сегодня?
+            </h3>
+            <p className="text-xs text-neutral-400 font-sans mt-0.5 leading-relaxed">
+              Спросите ассистента, загрузите схему или выберите быстрый сценарий...
+            </p>
           </div>
 
-          {/* Right: Clean action trigger */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline text-[11px] font-bold text-neutral-400 group-hover:text-neutral-200 font-sans transition-colors">
-              Открыть диалог
-            </span>
-            <div className="w-7 h-7 rounded-[8px] bg-white/5 group-hover:bg-violet-600 text-neutral-400 group-hover:text-white flex items-center justify-center transition-all">
-              <CaretUp size={13} weight="bold" />
-            </div>
+          {/* Center: 3D Pages Graphic (Emerging between text and button) */}
+          <div className="hidden sm:flex absolute left-[320px] sm:left-[350px] md:left-[390px] right-[180px] sm:right-[200px] md:right-[230px] -top-12 sm:-top-14 md:-top-16 bottom-1 pointer-events-none items-end justify-center z-30">
+            <img
+              src="/quick_start_pages.png"
+              alt="Быстрый старт"
+              className="h-[140px] sm:h-[160px] md:h-[180px] w-auto max-w-full object-contain filter drop-shadow-[0_14px_28px_rgba(0,0,0,0.55)] group-hover:scale-105 group-hover:-translate-y-1.5 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] select-none pointer-events-none"
+            />
+          </div>
+
+          {/* Right: Tactile Action Button */}
+          <div className="shrink-0 z-20">
+            <button
+              type="button"
+              className="bg-white hover:bg-neutral-100 text-neutral-950 font-extrabold text-xs px-5 sm:px-6 py-2.5 rounded-[8px] transition-all duration-200 hover:scale-102 active:scale-98 shadow-sm flex items-center justify-center gap-2 font-sans group/btn cursor-pointer"
+            >
+              <span>Открыть диалог</span>
+              <CaretUp
+                size={14}
+                weight="bold"
+                className="group-hover/btn:-translate-y-0.5 transition-transform"
+              />
+            </button>
           </div>
         </div>
 
