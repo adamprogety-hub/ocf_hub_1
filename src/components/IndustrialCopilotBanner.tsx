@@ -9,6 +9,14 @@ import {
   ArrowRight,
   Lightning,
   CaretUp,
+  CaretDown,
+  Paperclip,
+  Image as ImageIcon,
+  FileText,
+  FilePdf,
+  Plus,
+  Chats,
+  Check,
 } from '@phosphor-icons/react';
 import type { HardwareCategoryId } from '@/types/opc';
 
@@ -20,16 +28,32 @@ interface CopilotRecommendation {
   actionText: string;
 }
 
+interface AttachedFile {
+  id: string;
+  name: string;
+  size: string;
+  type: 'image' | 'document';
+  url: string;
+}
+
 interface Message {
   id: string;
   sender: 'assistant' | 'user';
   text: string;
+  attachments?: AttachedFile[];
   action?: {
     label: string;
     targetTab?: string;
     targetCategory?: HardwareCategoryId;
   };
   recommendation?: CopilotRecommendation;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  createdAt: string;
+  messages: Message[];
 }
 
 interface IndustrialCopilotBannerProps {
@@ -57,17 +81,38 @@ const QUICK_STARTERS = [
   },
 ];
 
+const INITIAL_CONVERSATIONS: Conversation[] = [
+  {
+    id: 'conv-1',
+    title: 'Новый диалог',
+    createdAt: 'Сегодня',
+    messages: [],
+  },
+];
+
 export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = ({
   onNavigateTab,
   onSelectCategory,
   onShowToast,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>(INITIAL_CONVERSATIONS);
+  const [activeConvId, setActiveConvId] = useState<string>('conv-1');
+  const [isConvMenuOpen, setIsConvMenuOpen] = useState(false);
+
   const [inputQuery, setInputQuery] = useState('');
+  const [pendingAttachments, setPendingAttachments] = useState<AttachedFile[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const convMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const activeConversation =
+    conversations.find((c) => c.id === activeConvId) || conversations[0];
+  const messages = activeConversation.messages;
 
   useEffect(() => {
     if (isExpanded) {
@@ -78,41 +123,219 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
     }
   }, [isExpanded, messages, isTyping]);
 
+  // Close conversation switcher popover when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (convMenuRef.current && !convMenuRef.current.contains(e.target as Node)) {
+        setIsConvMenuOpen(false);
+      }
+    };
+    if (isConvMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isConvMenuOpen]);
+
   // Handle ESC key to minimize
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isExpanded) {
-        setIsExpanded(false);
+        if (isConvMenuOpen) {
+          setIsConvMenuOpen(false);
+        } else {
+          setIsExpanded(false);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isExpanded]);
+  }, [isExpanded, isConvMenuOpen]);
+
+  // Create a new conversation
+  const handleCreateNewConversation = () => {
+    const newId = `conv-${Date.now()}`;
+    const newConv: Conversation = {
+      id: newId,
+      title: `Диалог ${conversations.length + 1}`,
+      createdAt: 'Только что',
+      messages: [],
+    };
+    setConversations((prev) => [newConv, ...prev]);
+    setActiveConvId(newId);
+    setIsConvMenuOpen(false);
+    setPendingAttachments([]);
+    if (onShowToast) onShowToast('Создан новый диалог');
+  };
+
+  // Delete a conversation
+  const handleDeleteConversation = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (conversations.length <= 1) {
+      // Just clear current messages
+      setConversations([
+        {
+          id: `conv-${Date.now()}`,
+          title: 'Новый диалог',
+          createdAt: 'Сегодня',
+          messages: [],
+        },
+      ]);
+      return;
+    }
+    const updated = conversations.filter((c) => c.id !== id);
+    setConversations(updated);
+    if (activeConvId === id) {
+      setActiveConvId(updated[0].id);
+    }
+  };
+
+  // Handle file uploads (photos or documents)
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const newAttachments: AttachedFile[] = [];
+    Array.from(files).forEach((file) => {
+      const isImg = file.type.startsWith('image/');
+      const sizeStr =
+        file.size > 1024 * 1024
+          ? `${(file.size / (1024 * 1024)).toFixed(1)} МБ`
+          : `${Math.round(file.size / 1024)} КБ`;
+
+      newAttachments.push({
+        id: `att-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        name: file.name,
+        size: sizeStr,
+        type: isImg ? 'image' : 'document',
+        url: URL.createObjectURL(file),
+      });
+    });
+
+    setPendingAttachments((prev) => [...prev, ...newAttachments]);
+    if (onShowToast) {
+      onShowToast(`Прикреплено файлов: ${newAttachments.length}`);
+    }
+  };
+
+  const handleRemoveAttachment = (id: string) => {
+    setPendingAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
 
   const handleSendPrompt = (rawText: string) => {
     const trimmed = rawText.trim();
-    if (!trimmed || isTyping) return;
+    if ((!trimmed && pendingAttachments.length === 0) || isTyping) return;
 
+    const currentAttachments = [...pendingAttachments];
     const userMsg: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: trimmed,
+      text: trimmed || (currentAttachments.length > 0 ? 'Анализ прикрепленных материалов' : ''),
+      attachments: currentAttachments.length > 0 ? currentAttachments : undefined,
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    // Update conversation title if it is the first user message
+    const hasExistingMessages = messages.length > 0;
+    const autoTitle = trimmed.length > 30 ? `${trimmed.slice(0, 30)}...` : trimmed || 'Анализ файлов';
+
+    setConversations((prev) =>
+      prev.map((c) => {
+        if (c.id === activeConvId) {
+          return {
+            ...c,
+            title: hasExistingMessages ? c.title : autoTitle,
+            messages: [...c.messages, userMsg],
+          };
+        }
+        return c;
+      })
+    );
+
     setInputQuery('');
+    setPendingAttachments([]);
     if (!isExpanded) setIsExpanded(true);
     setIsTyping(true);
 
     setTimeout(() => {
-      const response = generateAnswer(trimmed);
-      setMessages((prev) => [...prev, response]);
+      const response = generateAnswer(trimmed, currentAttachments);
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (c.id === activeConvId) {
+            return {
+              ...c,
+              messages: [...c.messages, response],
+            };
+          }
+          return c;
+        })
+      );
       setIsTyping(false);
     }, 600);
   };
 
-  const generateAnswer = (query: string): Message => {
+  const generateAnswer = (query: string, attached: AttachedFile[]): Message => {
     const q = query.toLowerCase();
+
+    // If attachments present, tailor answer to uploaded materials
+    if (attached.length > 0) {
+      const hasImage = attached.some((a) => a.type === 'image');
+      const hasDoc = attached.some((a) => a.type === 'document');
+
+      if (hasImage && hasDoc) {
+        return {
+          id: `assistant-${Date.now()}`,
+          sender: 'assistant',
+          text: `Файлы успешно обработаны: проанализированы фото узла автоматики и сопроводительная спецификация.\n\n• На схеме подтверждено соответствие портов Profinet/OPC UA (TCP 4840).\n• Карта регистров совпадает со стандартной структурой NodeId для промышленных контроллеров.\n• Рекомендуем запустить автообнаружение узлов в сети.`,
+          action: {
+            label: "Открыть раздел ПЛК",
+            targetCategory: 'plc',
+          },
+          recommendation: {
+            service: "Edge",
+            badge: "Ростелеком Экосистема",
+            title: "Аппаратная верификация конфигураций",
+            description: "Инженеры Ростелеком могут выполнить удалённую валидацию схем шкафов автоматики и параметров сетевых экранов.",
+            actionText: "Запросить инженерную консультацию",
+          },
+        };
+      }
+
+      if (hasImage) {
+        return {
+          id: `assistant-${Date.now()}`,
+          sender: 'assistant',
+          text: `Изображение «${attached[0].name}» проанализировано встроенным зрением Copilot:\n\n• Идентифицирован технологический модуль с Ethernet-интерфейсом.\n• Индикация питания в норме, активен статус готовности сетевого стека.\n• Для опроса переменных укажите адрес шлюза в формате opc.tcp://10.0.x.x:4840.`,
+          action: {
+            label: "Создать подключение к устройству",
+            targetTab: 'connections',
+          },
+          recommendation: {
+            service: "Security",
+            badge: "ГК «Солар»",
+            title: "Контроль физического и сетевого периметра",
+            description: "Мониторинг технологических шкафов и каналов связи с ПЛК для защиты от несанкционированного прямого подключения.",
+            actionText: "Подключить периметральную защиту",
+          },
+        };
+      }
+
+      if (hasDoc) {
+        return {
+          id: `assistant-${Date.now()}`,
+          sender: 'assistant',
+          text: `Документ «${attached[0].name}» разобран:\n\n• Извлечены параметры протокола OPC UA v1.04 и перечень сигналов.\n• Рекомендуемый период опроса (Publishing Interval): 250 мс, глубина очереди QueueSize = 20.\n• Переменные готовы к автоматическому маппингу в пространство адресов.`,
+          action: {
+            label: "Перейти в Настройки системы",
+            targetTab: 'settings',
+          },
+          recommendation: {
+            service: "Cloud",
+            badge: "Ростелеком Cloud",
+            title: "Импорт карт регистров в защищенный архив",
+            description: "Автоматическая синхронизация схемы тегов с облачным хранилищем телеметрии Ростелеком ЦОД Tier III.",
+            actionText: "Связать с облачным репозиторием",
+          },
+        };
+      }
+    }
 
     // 1. Siemens / PLC
     if (q.includes('siemens') || q.includes('s7') || q.includes('плк') || q.includes('контроллер')) {
@@ -233,32 +456,32 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
 
   return (
     <>
+      {/* Hidden File Input for uploading documents and photos */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={(e) => handleFileUpload(e.target.files)}
+        multiple
+        accept="image/*,.pdf,.doc,.docx,.xml,.pcap,.txt,.json,.csv"
+        className="hidden"
+      />
+
       {/* ========================================================================= */}
       {/* 1. COLLAPSED DOCKED BAR (At the bottom of the page)                        */}
-      {/*    No clipped shadows! Clean border & subtle ring.                         */}
       {/* ========================================================================= */}
       <div className="relative z-10 shrink-0 mt-3 select-none">
         <div
           onClick={() => setIsExpanded(true)}
           className="group h-[56px] rounded-[14px] bg-[#0c0d12] hover:bg-[#11131c] border border-white/10 hover:border-violet-500/40 transition-all duration-200 px-3.5 sm:px-4 flex items-center justify-between gap-3 cursor-pointer"
         >
-          {/* Left: Friendly Engineer Avatar + Clean Greeting Input Trigger */}
+          {/* Left: Clean Greeting Input Trigger (No avatars or logos) */}
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="relative shrink-0">
-              <img
-                src="/engineer_avatar.png"
-                alt="Инженер OCF Copilot"
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-violet-500/40 group-hover:ring-violet-400 transition-all"
-              />
-              <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -bottom-0.5 -right-0.5 ring-2 ring-[#0c0d12]" />
-            </div>
-
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-bold text-white font-heading tracking-tight truncate">
                 Привет, какой план на сегодня?
               </span>
               <span className="text-[11px] text-neutral-400 font-sans tracking-tight truncate">
-                Спросите ассистента или выберите быстрый сценарий...
+                Спросите ассистента, загрузите схему или выберите быстрый сценарий...
               </span>
             </div>
           </div>
@@ -277,65 +500,144 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
 
       {/* ========================================================================= */}
       {/* 2. EXPANDED DIALOG (Opens upwards with EQUAL OFFSETS from outer canvas)   */}
-      {/*    inset-0 inside main = exactly 24px from top, bottom, left, right!       */}
-      {/*    No oversized shadows -> zero clipped-shadow artifacts!                  */}
+      {/*    Continuous living background with pure CSS mask-image fade!            */}
       {/* ========================================================================= */}
       {isExpanded && (
         <div
-          className="absolute inset-0 z-40 bg-[#0c0d12] text-white rounded-[16px] border border-white/10 flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-240 ease-[cubic-bezier(0.16,1,0.3,1)] select-none"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            handleFileUpload(e.dataTransfer.files);
+          }}
+          className={`absolute inset-0 z-40 bg-[#0c0d12] text-white rounded-[16px] border ${
+            isDragging ? 'border-violet-500 ring-2 ring-violet-500/40' : 'border-white/10'
+          } flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-240 ease-[cubic-bezier(0.16,1,0.3,1)] select-none`}
         >
-          {/* Two Living, Flowing Amorphous Fluid Textures */}
+          {/* Two Living, Flowing Amorphous Fluid Textures (Zero cut-off rectangles!) */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[16px] z-0">
             {/* Amorphous Blob 1: Deep Violet & Indigo Aurora */}
             <div
-              className="animate-blob-1 absolute -top-16 -right-16 w-[440px] h-[440px] filter blur-[75px] opacity-30 pointer-events-none"
+              className="animate-blob-1 absolute -top-20 -right-20 w-[460px] h-[460px] filter blur-[75px] opacity-30 pointer-events-none"
               style={{
-                background: 'radial-gradient(circle at 45% 45%, rgba(139, 92, 246, 0.7) 0%, rgba(99, 102, 241, 0.45) 45%, rgba(67, 56, 202, 0.1) 75%, transparent 100%)',
+                background:
+                  'radial-gradient(circle at 45% 45%, rgba(139, 92, 246, 0.75) 0%, rgba(99, 102, 241, 0.45) 45%, rgba(67, 56, 202, 0.1) 75%, transparent 100%)',
               }}
             />
 
             {/* Amorphous Blob 2: Cyan & Electric Blue Nebula */}
             <div
-              className="animate-blob-2 absolute -bottom-20 -left-16 w-[480px] h-[480px] filter blur-[85px] opacity-25 pointer-events-none"
+              className="animate-blob-2 absolute -bottom-24 -left-20 w-[500px] h-[500px] filter blur-[85px] opacity-25 pointer-events-none"
               style={{
-                background: 'radial-gradient(circle at 55% 55%, rgba(56, 189, 248, 0.55) 0%, rgba(79, 70, 229, 0.38) 45%, rgba(124, 58, 237, 0.1) 75%, transparent 100%)',
+                background:
+                  'radial-gradient(circle at 55% 55%, rgba(56, 189, 248, 0.6) 0%, rgba(79, 70, 229, 0.38) 45%, rgba(124, 58, 237, 0.1) 75%, transparent 100%)',
               }}
             />
           </div>
 
           {/* ----------------------------------------------------------------------- */}
-          {/* HEADER: Ultra-clean, with Human Engineer Identity (Seamless Dark Fade)  */}
+          {/* HEADER: Pure Minimalist Title + Multi-Dialog Switcher                   */}
           {/* ----------------------------------------------------------------------- */}
-          <div className="relative z-20 px-5 sm:px-6 pt-4 pb-2.5 flex items-center justify-between shrink-0 bg-gradient-to-b from-[#0c0d12] via-[#0c0d12]/90 to-transparent">
+          <div className="relative z-30 px-5 sm:px-6 py-4 flex items-center justify-between shrink-0">
+            {/* Left: OCF Copilot + Multi-Chat Switcher */}
             <div className="flex items-center gap-3">
-              <div className="relative shrink-0">
-                <img
-                  src="/engineer_avatar.png"
-                  alt="Инженер OCF Copilot"
-                  className="w-7 h-7 rounded-full object-cover ring-2 ring-violet-500/40"
-                />
-                <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -bottom-0.5 -right-0.5 ring-2 ring-[#0c0d12]" />
+              <span className="font-heading font-black text-sm tracking-tight text-white select-none">
+                OCF Copilot
+              </span>
+
+              {/* Multi-dialog dropdown trigger */}
+              <div className="relative" ref={convMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsConvMenuOpen(!isConvMenuOpen)}
+                  className="tactile-btn flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-sans text-neutral-300 hover:text-white transition-colors cursor-pointer"
+                  title="Управление диалогами"
+                >
+                  <Chats size={13} weight="light" className="text-violet-400" />
+                  <span className="max-w-[140px] truncate text-[11px] font-medium">
+                    {activeConversation.title}
+                  </span>
+                  <CaretDown size={10} weight="bold" className="text-neutral-400" />
+                </button>
+
+                {/* Dropdown Popover */}
+                {isConvMenuOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-64 rounded-[12px] bg-[#12141c]/95 backdrop-blur-xl border border-white/12 shadow-[0_16px_36px_rgba(0,0,0,0.55)] p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between px-2 py-1.5 mb-1 border-b border-white/8 text-[11px] font-bold text-neutral-400 font-sans">
+                      <span>Диалоги ({conversations.length})</span>
+                      <button
+                        type="button"
+                        onClick={handleCreateNewConversation}
+                        className="text-violet-400 hover:text-violet-300 flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus size={11} weight="bold" />
+                        <span>Новый</span>
+                      </button>
+                    </div>
+
+                    <div className="max-h-48 overflow-y-auto space-y-1">
+                      {conversations.map((conv) => {
+                        const isActive = conv.id === activeConvId;
+                        return (
+                          <div
+                            key={conv.id}
+                            onClick={() => {
+                              setActiveConvId(conv.id);
+                              setIsConvMenuOpen(false);
+                            }}
+                            className={`group/item flex items-center justify-between px-2.5 py-1.5 rounded-[8px] text-xs font-sans cursor-pointer transition-colors ${
+                              isActive
+                                ? 'bg-violet-600/30 text-white font-medium border border-violet-500/40'
+                                : 'hover:bg-white/5 text-neutral-300 hover:text-white'
+                            }`}
+                          >
+                            <span className="truncate max-w-[170px]">{conv.title}</span>
+                            <div className="flex items-center gap-1 shrink-0">
+                              {isActive && <Check size={12} weight="bold" className="text-violet-400" />}
+                              <button
+                                type="button"
+                                onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                className="opacity-0 group-hover/item:opacity-100 p-1 hover:text-rose-400 transition-opacity cursor-pointer"
+                                title="Удалить диалог"
+                              >
+                                <Trash size={12} weight="light" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-heading font-black text-sm tracking-tight text-white">
-                    Инженер OCF Copilot
-                  </span>
-                  <span className="text-[10px] font-bold text-emerald-400 font-sans">
-                    Онлайн
-                  </span>
-                </div>
-              </div>
+              {/* Quick + New dialog button */}
+              <button
+                type="button"
+                onClick={handleCreateNewConversation}
+                className="tactile-btn p-1.5 rounded-[6px] bg-white/[0.04] hover:bg-white/[0.1] text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                title="Создать новый диалог"
+              >
+                <Plus size={12} weight="bold" />
+              </button>
             </div>
 
+            {/* Right: Actions */}
             <div className="flex items-center gap-1.5">
               {messages.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setMessages([])}
+                  onClick={() => {
+                    setConversations((prev) =>
+                      prev.map((c) => (c.id === activeConvId ? { ...c, messages: [] } : c))
+                    );
+                  }}
                   className="tactile-btn p-2 rounded-[8px] hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                  title="Очистить диалог"
+                  title="Очистить сообщения диалога"
                 >
                   <Trash size={15} weight="light" />
                 </button>
@@ -351,33 +653,28 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
             </div>
           </div>
 
-          {/* Top smooth dark fade under header */}
-          <div className="absolute top-[52px] left-0 right-0 h-10 bg-gradient-to-b from-[#0c0d12]/95 via-[#0c0d12]/50 to-transparent pointer-events-none z-20" />
-
           {/* ----------------------------------------------------------------------- */}
-          {/* CHAT BODY: Scrollable Canvas                                             */}
+          {/* CHAT BODY: Scrollable Canvas with Pure Mask-Image Smooth Fade            */}
+          {/*    (Zero cut-off rectangles! Messages dissolve seamlessly into dark)    */}
           {/* ----------------------------------------------------------------------- */}
           <div
             ref={chatScrollRef}
-            className="relative z-10 flex-1 overflow-y-auto px-5 sm:px-6 py-5 space-y-5 font-sans"
+            style={{
+              maskImage:
+                'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 36px), transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 36px), transparent 100%)',
+            }}
+            className="relative z-10 flex-1 overflow-y-auto px-5 sm:px-6 py-6 space-y-5 font-sans"
           >
-            {/* If no messages yet: Large clean greeting with human avatar */}
+            {/* If no messages yet: Pure Clean greeting without avatars or logos */}
             {messages.length === 0 && (
               <div className="h-full flex flex-col justify-center max-w-lg mx-auto py-6 text-center animate-in fade-in duration-300">
-                <div className="relative mx-auto mb-4 w-18 h-18">
-                  <img
-                    src="/engineer_avatar.png"
-                    alt="Инженер OCF Copilot"
-                    className="w-18 h-18 rounded-full object-cover ring-3 ring-violet-500/40 shadow-lg mx-auto"
-                  />
-                  <span className="w-3.5 h-3.5 rounded-full bg-emerald-400 absolute bottom-0 right-1 ring-3 ring-[#0c0d12]" />
-                </div>
-
                 <h2 className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight mb-2">
                   Привет, какой план на сегодня?
                 </h2>
                 <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed mb-6">
-                  Задайте вопрос по подключению ПЛК, политикам шифрования X.509 или выберите нужный сценарий:
+                  Задайте вопрос по подключению ПЛК, политикам шифрования X.509 или загрузите схему/паспорт оборудования:
                 </p>
 
                 {/* Minimal clean starter chips */}
@@ -405,19 +702,8 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex gap-3 ${
-                  msg.sender === 'user' ? 'justify-end' : 'justify-start'
-                }`}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {/* Assistant Avatar beside bubble */}
-                {msg.sender === 'assistant' && (
-                  <img
-                    src="/engineer_avatar.png"
-                    alt="Инженер"
-                    className="w-7 h-7 rounded-full object-cover ring-1 ring-violet-500/30 shrink-0 mt-1"
-                  />
-                )}
-
                 <div
                   className={`max-w-[90%] sm:max-w-[78%] rounded-[14px] p-4 text-xs leading-relaxed font-sans ${
                     msg.sender === 'user'
@@ -425,6 +711,36 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
                       : 'bg-white/[0.05] text-neutral-200 border border-white/10'
                   }`}
                 >
+                  {/* Uploaded attachments preview inside message bubble */}
+                  {msg.attachments && msg.attachments.length > 0 && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {msg.attachments.map((file) => (
+                        <div
+                          key={file.id}
+                          className="rounded-[8px] overflow-hidden border border-white/15 bg-black/30 p-1 flex items-center gap-2 max-w-full"
+                        >
+                          {file.type === 'image' ? (
+                            <img
+                              src={file.url}
+                              alt={file.name}
+                              className="w-12 h-12 object-cover rounded-[6px]"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-[6px] bg-white/10 flex items-center justify-center shrink-0">
+                              <FilePdf size={18} weight="light" className="text-rose-400" />
+                            </div>
+                          )}
+                          <div className="pr-2 min-w-0">
+                            <div className="text-[11px] font-bold text-white truncate max-w-[140px]">
+                              {file.name}
+                            </div>
+                            <div className="text-[9px] text-neutral-300">{file.size}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <p className="whitespace-pre-line text-xs font-sans">{msg.text}</p>
 
                   {/* Clean Action Button */}
@@ -479,47 +795,76 @@ export const IndustrialCopilotBanner: React.FC<IndustrialCopilotBannerProps> = (
 
             {/* Typing Indicator */}
             {isTyping && (
-              <div className="flex items-center gap-3 text-neutral-400 text-xs">
-                <img
-                  src="/engineer_avatar.png"
-                  alt="Инженер"
-                  className="w-7 h-7 rounded-full object-cover ring-1 ring-violet-500/30 shrink-0"
-                />
-                <div className="flex items-center gap-2 p-2.5 rounded-[12px] bg-white/[0.04] border border-white/8">
-                  <Sparkle size={13} weight="fill" className="text-violet-400 animate-spin" />
-                  <span>Формирую ответ...</span>
-                </div>
+              <div className="flex items-center gap-2 p-2.5 rounded-[12px] bg-white/[0.04] border border-white/8 text-neutral-400 text-xs w-fit">
+                <Sparkle size={13} weight="fill" className="text-violet-400 animate-spin" />
+                <span>Формирую ответ...</span>
               </div>
             )}
           </div>
 
-          {/* Bottom smooth dark fade above input */}
-          <div className="absolute bottom-[68px] left-0 right-0 h-12 bg-gradient-to-t from-[#0c0d12]/95 via-[#0c0d12]/60 to-transparent pointer-events-none z-20" />
+          {/* ----------------------------------------------------------------------- */}
+          {/* FOOTER: Input Bar with Attachment Trigger (Documents & Photos)          */}
+          {/* ----------------------------------------------------------------------- */}
+          <div className="relative z-20 px-5 sm:px-6 pb-4 pt-2 shrink-0">
+            {/* Pending Attachments Strip */}
+            {pendingAttachments.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-2 animate-in fade-in duration-150">
+                {pendingAttachments.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center gap-2 bg-[#191b26] border border-white/12 rounded-[8px] pl-2 pr-1.5 py-1 text-xs text-white shadow-sm"
+                  >
+                    {file.type === 'image' ? (
+                      <ImageIcon size={14} weight="light" className="text-violet-400" />
+                    ) : (
+                      <FileText size={14} weight="light" className="text-blue-400" />
+                    )}
+                    <span className="max-w-[120px] truncate text-[11px]">{file.name}</span>
+                    <span className="text-[9px] text-neutral-400">{file.size}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAttachment(file.id)}
+                      className="p-1 hover:text-rose-400 text-neutral-400 cursor-pointer"
+                      title="Удалить"
+                    >
+                      <X size={11} weight="bold" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
-          {/* ----------------------------------------------------------------------- */}
-          {/* FOOTER: Crisp Input Bar (Seamless Dark Fade, No Hard Border Lines)      */}
-          {/* ----------------------------------------------------------------------- */}
-          <div className="relative z-20 px-5 sm:px-6 pb-4 pt-1 shrink-0 bg-gradient-to-t from-[#0c0d12] via-[#0c0d12]/95 to-transparent">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendPrompt(inputQuery);
               }}
-              className="flex items-center gap-3 bg-[#13151d]/90 backdrop-blur-md border border-white/10 rounded-[12px] px-4 py-2.5 focus-within:border-violet-500/60 focus-within:ring-1 focus-within:ring-violet-500/20 transition-all shadow-lg shadow-black/25"
+              className="flex items-center gap-2.5 bg-[#13151d]/90 backdrop-blur-md border border-white/10 rounded-[12px] px-3.5 py-2.5 focus-within:border-violet-500/60 focus-within:ring-1 focus-within:ring-violet-500/20 transition-all shadow-lg shadow-black/25"
             >
+              {/* Paperclip attachment button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="tactile-btn p-1.5 rounded-[6px] hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                title="Прикрепить документы или фотографии"
+              >
+                <Paperclip size={16} weight="light" />
+              </button>
+
               <input
                 ref={inputRef}
                 type="text"
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
-                placeholder="Задайте вопрос по контроллерам, протоколам, архивам..."
+                placeholder="Задайте вопрос, загрузите схему/паспорт оборудования или фото узла..."
                 className="bg-transparent text-xs text-white placeholder:text-neutral-500 outline-none w-full font-sans"
               />
+
               <button
                 type="submit"
-                disabled={!inputQuery.trim() || isTyping}
+                disabled={(!inputQuery.trim() && pendingAttachments.length === 0) || isTyping}
                 className={`w-7 h-7 rounded-[8px] flex items-center justify-center transition-all cursor-pointer shrink-0 ${
-                  inputQuery.trim() && !isTyping
+                  (inputQuery.trim() || pendingAttachments.length > 0) && !isTyping
                     ? 'bg-violet-600 hover:bg-violet-500 text-white shadow-sm hover:scale-105 active:scale-95'
                     : 'bg-white/5 text-neutral-500 cursor-not-allowed'
                 }`}

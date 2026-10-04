@@ -270,6 +270,28 @@ export const AlarmsView: React.FC<AlarmsViewProps> = ({ onShowToast, onNavigateT
 
   const uniqueServers = Array.from(new Set(alarms.map((a) => a.serverName)));
 
+  // Clean equipment name for minimalist cards (strips noisy parent paths and suffixes)
+  const getCleanSourceName = (name: string) => {
+    if (!name) return '';
+    const parts = name.split(' • ');
+    let short = parts[parts.length - 1];
+    short = short.replace(/\s*\([^)]*\)/g, '').trim();
+    short = short.replace(/^Приточная установка\s+/i, 'Приточная ');
+    return short || name;
+  };
+
+  // Clean alarm reason for minimalist cards (short essential text only)
+  const getCleanReason = (alarm: AlarmItem) => {
+    if (alarm.id === 'alm-1') return 'Перегрев подачи';
+    if (alarm.id === 'alm-2') return 'Сухой ход';
+    if (alarm.id === 'alm-3') return 'Угроза обмерзания';
+    if (alarm.id === 'alm-4') return 'Низкое давление масла';
+    if (alarm.id === 'alm-5') return 'Просадка подпитки';
+    if (alarm.id === 'alm-6') return 'Восстановление связи';
+    const msg = alarm.message.split(':')[0] || alarm.message;
+    return msg.length > 26 ? `${msg.slice(0, 26)}...` : msg;
+  };
+
   // Top unacknowledged emergency alarms for the banner track, sorted by severity
   const unackAlarms = useMemo(() => {
     return alarms
@@ -330,116 +352,82 @@ export const AlarmsView: React.FC<AlarmsViewProps> = ({ onShowToast, onNavigateT
         </div>
       </div>
 
-      {/* Unified Long Dark Banner: Emergency action + Individual active alarm cards track */}
-      <div className="bg-[#0e0f14] text-white rounded-[18px] border border-white/10 p-3.5 sm:p-4 relative overflow-x-auto select-none shrink-0 flex items-stretch gap-3.5 mt-3 mb-5 sm:mb-6">
-        {/* Action 1: Acknowledge All Button Card at the start of the row */}
-        <button
-          onClick={handleAcknowledgeAll}
-          disabled={activeUnackCount === 0 && alarms.every((a) => a.state !== 'cleared_unack')}
-          className={`w-36 sm:w-44 rounded-[14px] p-4 flex flex-col items-center justify-center gap-2.5 transition-all shrink-0 border select-none text-center active:scale-98 ${
-            activeUnackCount > 0
-              ? 'bg-rose-600 hover:bg-rose-500 text-white border-rose-400/30 cursor-pointer group shadow-[0_4px_16px_rgba(225,29,72,0.3)]'
-              : 'bg-neutral-800/80 text-neutral-400 border-white/5 cursor-not-allowed'
-          }`}
-          title="Квитировать все неподтверждённые аварии"
-        >
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform shadow-xs ${
-            activeUnackCount > 0 ? 'bg-white/20 group-hover:scale-110' : 'bg-white/5'
-          }`}>
-            <Check size={20} weight="light" />
-          </div>
-          <span className="text-xs font-bold font-sans leading-tight">
-            Квитировать всё<br />({activeUnackCount})
-          </span>
-        </button>
-
-        {/* Dynamic Individual Alarm Cards Track - Sorted by severity, large size, minimal info */}
+      {/* Unified Long Dark Banner: Emergency action + Minimal active alarm cards track */}
+      <div className="bg-[#0e0f14] text-white rounded-[18px] border border-white/10 p-3 sm:p-3.5 relative overflow-x-auto select-none shrink-0 flex items-stretch gap-3 mt-3 mb-5 sm:mb-6">
         {unackAlarms.length > 0 ? (
-          unackAlarms.map((alarm) => {
-            const isCritical = alarm.severityScore >= 800;
-            const isHigh = alarm.severityScore >= 600 && alarm.severityScore < 800;
-            const bgColor = isCritical ? 'bg-rose-500' : isHigh ? 'bg-amber-400' : 'bg-amber-300';
+          <>
+            {/* Action: Acknowledge All Button Card */}
+            <button
+              onClick={handleAcknowledgeAll}
+              className="w-28 sm:w-32 rounded-[14px] p-3 flex flex-col items-center justify-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white border border-rose-400/30 cursor-pointer shadow-[0_4px_16px_rgba(225,29,72,0.3)] transition-all shrink-0 select-none text-center active:scale-98"
+              title="Квитировать все неподтверждённые аварии"
+            >
+              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center shadow-xs">
+                <Check size={15} weight="bold" />
+              </div>
+              <span className="text-[11px] font-bold font-sans leading-tight">
+                Квит. всё<br />({activeUnackCount})
+              </span>
+            </button>
 
-            // Minimal short title for the alarm essence
-            const shortReason =
-              alarm.id === 'alm-1'
-                ? 'Перегрев подачи'
-                : alarm.id === 'alm-2'
-                ? 'Сухой ход насоса'
-                : alarm.id === 'alm-3'
-                ? 'Угроза обмерзания'
-                : alarm.id === 'alm-4'
-                ? 'Низкое давление масла'
-                : alarm.id === 'alm-5'
-                ? 'Просадка подпитки'
-                : alarm.id === 'alm-6'
-                ? 'Восстановление связи'
-                : alarm.message.split(':')[0] || alarm.message;
+            {/* Dynamic Minimalist Alarm Cards - Only the essentials */}
+            {unackAlarms.map((alarm) => {
+              const isCritical = alarm.severityScore >= 800;
+              const isHigh = alarm.severityScore >= 600 && alarm.severityScore < 800;
+              const bgColor = isCritical ? 'bg-rose-500' : isHigh ? 'bg-amber-400' : 'bg-amber-300';
+              const shortSource = getCleanSourceName(alarm.sourceName);
+              const shortReason = getCleanReason(alarm);
+              const cleanValue = alarm.value.replace(/\s*\([^)]*\)/g, '').trim();
 
-            return (
-              <div
-                key={alarm.id}
-                className={`relative z-10 w-[320px] sm:w-[350px] md:w-[380px] rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 select-none ${bgColor} text-neutral-950 transition-all`}
-              >
-                <div>
+              return (
+                <div
+                  key={alarm.id}
+                  className={`relative z-10 w-[230px] sm:w-[250px] rounded-[14px] p-3.5 flex flex-col justify-between shadow-md shrink-0 select-none ${bgColor} text-neutral-950 transition-all`}
+                >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-sm sm:text-base font-black text-neutral-950 font-heading tracking-tight leading-snug truncate" title={alarm.sourceName}>
-                      {alarm.sourceName}
+                    <h3
+                      className="text-sm font-black text-neutral-950 font-heading tracking-tight leading-tight truncate"
+                      title={alarm.sourceName}
+                    >
+                      {shortSource}
                     </h3>
-                    <span className="text-[11px] font-heading font-bold text-black/60 shrink-0 mt-0.5">
-                      {alarm.activeTime}
-                    </span>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleAcknowledge(alarm.id, e)}
+                      className="px-2 py-1 rounded-[6px] bg-black/90 hover:bg-black text-white text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+                      title="Квитировать данное событие"
+                    >
+                      <Check size={12} weight="bold" />
+                      <span>Квит</span>
+                    </button>
                   </div>
 
-                  {/* Minimal Hero Value & Short Reason */}
-                  <div className="my-2">
-                    <div className="text-3xl font-black font-heading text-neutral-950 tracking-tight">
-                      {alarm.value}
+                  <div className="mt-2.5">
+                    <div className="text-2xl font-black font-heading text-neutral-950 tracking-tight leading-none">
+                      {cleanValue}
                     </div>
-                    <p className="text-xs text-black/85 font-sans font-bold mt-0.5 tracking-tight truncate">
+                    <p className="text-[11px] text-black/85 font-sans font-bold mt-1 tracking-tight truncate">
                       {shortReason}
                     </p>
                   </div>
                 </div>
-
-                {/* Minimal Card Footer: Clean Acknowledge Button */}
-                <div className="pt-2 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-                  <span className="text-[11px] text-black/60 font-heading font-semibold">
-                    {isCritical ? 'Критическая' : isHigh ? 'Высокая' : 'Предупреждение'}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={(e) => handleAcknowledge(alarm.id, e)}
-                    className="px-3.5 py-1.5 rounded-[8px] bg-neutral-950 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
-                    title="Квитировать данное событие"
-                  >
-                    <Check size={13} weight="bold" />
-                    <span>Квит.</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </>
         ) : (
           /* Normal State: Calm solid green card when all alarms are acknowledged */
-          <div className="relative z-10 w-full sm:w-[360px] md:w-[400px] rounded-[14px] p-4 flex flex-col justify-between shadow-md shrink-0 bg-emerald-500 text-neutral-950">
+          <div className="relative z-10 rounded-[14px] px-4 py-3 flex items-center gap-3 bg-emerald-500 text-neutral-950 shadow-md shrink-0">
+            <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+              <Check size={18} weight="bold" />
+            </div>
             <div>
-              <h3 className="text-base font-black text-neutral-950 font-heading tracking-tight">
+              <h3 className="text-sm font-black text-neutral-950 font-heading tracking-tight leading-none">
                 Все системы в норме
               </h3>
-              <p className="text-xs text-emerald-950/80 font-sans mt-0.5 font-medium">
+              <p className="text-xs text-black/75 font-sans mt-0.5 font-medium">
                 Активных неквитированных инцидентов нет
               </p>
-            </div>
-
-            <div className="mt-3.5 pt-2.5 border-t border-black/10 flex items-center justify-between text-xs font-sans">
-              <span className="text-[11px] text-emerald-950/70 font-sans font-medium">
-                Нормализовано: {clearedCount} за смену
-              </span>
-              <span className="px-2 py-0.5 rounded-[5px] bg-emerald-950 text-emerald-100 text-[10px] font-bold">
-                Штатный режим
-              </span>
             </div>
           </div>
         )}
