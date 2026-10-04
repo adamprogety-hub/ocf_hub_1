@@ -174,7 +174,7 @@ export default function Home() {
             {activeTab === 'connections' && (
               <div
                 key="connections"
-                className={`flex-1 min-w-0 flex h-full gap-5 ${
+                className={`flex-1 min-w-0 flex h-full ${selectedCategory && isRightDrawerOpen ? 'gap-5' : ''} ${
                   tabDirection === 'down' ? 'animate-tab-down' : 'animate-tab-up'
                 }`}
               >
@@ -245,7 +245,7 @@ export default function Home() {
                           </div>
 
                           {/* Grid of Hardware Categories (4 Large Glassmorphism Cards) */}
-                          <div className="flex-1 min-w-0 overflow-y-auto p-5 -m-5">
+                          <div className="flex-1 min-w-0 overflow-y-auto py-1">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4.5 auto-rows-fr">
                               {HARDWARE_CATEGORIES.map((cat) => (
                                 <CategoryCard
@@ -332,27 +332,29 @@ export default function Home() {
                   </main>
 
                   {/* Collapsible Right Parameter Drawer (only when inside a category) */}
-                  <RightDrawer
-                    isOpen={isRightDrawerOpen && Boolean(selectedCategory)}
-                    mode={drawerMode}
-                    onClose={() => setIsRightDrawerOpen(false)}
-                    connection={selectedConnection}
-                    connections={categoryConnections}
-                    allConnections={connections}
-                    currentCategoryTitle={currentCategory?.title}
-                    onSelectConnection={(conn) => {
-                      setSelectedConnId(conn.id);
-                      setDrawerMode('view');
-                      setIsRightDrawerOpen(true);
-                    }}
-                    onDeleteConnection={handleDeleteConnection}
-                    onOpenSession={handleConnectSession}
-                    onAddConnection={handleAddConnection}
-                    onSwitchMode={(mode) => {
-                      setDrawerMode(mode);
-                      setIsRightDrawerOpen(true);
-                    }}
-                  />
+                  {Boolean(selectedCategory) && (
+                    <RightDrawer
+                      isOpen={isRightDrawerOpen}
+                      mode={drawerMode}
+                      onClose={() => setIsRightDrawerOpen(false)}
+                      connection={selectedConnection}
+                      connections={categoryConnections}
+                      allConnections={connections}
+                      currentCategoryTitle={currentCategory?.title}
+                      onSelectConnection={(conn) => {
+                        setSelectedConnId(conn.id);
+                        setDrawerMode('view');
+                        setIsRightDrawerOpen(true);
+                      }}
+                      onDeleteConnection={handleDeleteConnection}
+                      onOpenSession={handleConnectSession}
+                      onAddConnection={handleAddConnection}
+                      onSwitchMode={(mode) => {
+                        setDrawerMode(mode);
+                        setIsRightDrawerOpen(true);
+                      }}
+                    />
+                  )}
                 </>
               )}
             </div>
